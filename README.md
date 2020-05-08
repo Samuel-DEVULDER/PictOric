@@ -34,7 +34,9 @@ If you intend to use it in command-line, add the appropriate exes (convert and l
 
 * *from the command line*: 
   To run it from the command-line just run:
+  
   ```         <lua-interperter> PictOric.lua <filename>.<ext>```
+  
   where:
   * `<lua-intepreter>` is the lua interpreter you want to use (LuaJIT.exe for instance under windows)
   * `<filename>.<ext>` is the full path to the picture you want to convert

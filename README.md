@@ -28,13 +28,13 @@ If you intend to use it in command-line, add the appropriate exes (convert and l
 
 ## Usage 
 
-* *from GrafX2*, simply click on the "Fx" button in the GUI and navigate to the folder where you saved `PictOric.lua` and double click on it.
+* _from GrafX2_, simply click on the "Fx" button in the GUI and navigate to the folder where you saved `PictOric.lua` and double click on it.
   
   <img src="http://forum.defence-force.org/download/file.php?id=1775&t=1">
   
   Conversion takes typically around 20secs on modern machines (by 2020 standards ;) ).
 
-* *from the command line*, just run:
+* _from the command line_, just run:
   
   ```         <lua-interperter> PictOric.lua <filename>.<ext>```
   

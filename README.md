@@ -12,7 +12,7 @@ Image conversion tool for the Oric machines.
 * Optionnally:
 	* Saves a BMP preview of the converted file next to the TAP file (*on* by default, see code).
 	* Adds a basic loader in the TAP file (*on* by default, see code).\
-	  You just then need to `CLOAD ""` to load and display the picture on the machine.
+	  You just then need to type `CLOAD ""` to load and display the picture on the machine.
 	* Starts an emulator on the generated TAP file when the conversion finishes (*off* by default, see code).
 	  <img src="http://forum.defence-force.org/download/file.php?id=1672&t=1">
 

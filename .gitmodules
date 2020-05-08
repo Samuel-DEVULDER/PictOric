@@ -1,0 +1,6 @@
+[submodule "LuaJIT"]
+	path = tools/LuaJIT
+	url = https://github.com/LuaJIT/LuaJIT.git
+[submodule "tools/ImageMagick"]
+	path = tools/ImageMagick
+	url = https://github.com/ImageMagick/ImageMagick.git

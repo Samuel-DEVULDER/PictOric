@@ -50,7 +50,7 @@ The discussion about this algorithm takes place on the [Defence-Force forum](htt
 <img src="http://forum.defence-force.org/download/file.php?id=1700"> <img src="http://forum.defence-force.org/download/file.php?id=1719">
 <img src="http://forum.defence-force.org/download/file.php?id=1698"> <img src="http://forum.defence-force.org/download/file.php?id=1718">
 <img src="http://forum.defence-force.org/download/file.php?id=1717"> <img src="http://forum.defence-force.org/download/file.php?id=1763">
-<img src=http://forum.defence-force.org/download/file.php?id=2085"> <img src="http://forum.defence-force.org/download/file.php?id=2084">
+<img src="http://forum.defence-force.org/download/file.php?id=2085"> <img src="http://forum.defence-force.org/download/file.php?id=2084">
 
 Source | Converted
 ---|----

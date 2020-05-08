@@ -16,7 +16,7 @@ Image conversion tool for the Oric machines.
 
 ## Installation
 
-Just copy PictOric.lua wherever you want (possibly inside the share/grafx2/scripts folder). 
+Just copy [PictOric.lua](PictOric.lua) wherever you want (possibly inside the share/grafx2/scripts folder). 
 
 If you intend to use it in command-line, add the appropriate exes (convert and luajit) next to the lua script. 
 

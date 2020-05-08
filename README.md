@@ -13,11 +13,12 @@ Image conversion tool for the Oric machines.
 	* saves a BMP preview of the converted file next to the TAP file (*on* by default, see code).
 	* Adds a basic loader in the TAP file (*on* by default, see code). You just then need to `CLOAD ""` to view the picture on the oric.
 	* Starts an emulator on the generated TAP file:
+	
 	  <img src="http://forum.defence-force.org/download/file.php?id=1672&t=1">
 
 ## Installation
 
-Just copy [PictOric.lua](PictOric.lua) wherever you want (possibly inside the share/grafx2/scripts folder). 
+Just copy [PictOric.lua](./PictOric.lua) wherever you want (possibly inside the share/grafx2/scripts folder). 
 
 If you intend to use it in command-line, add the appropriate exes (convert and luajit) next to the lua script. 
 

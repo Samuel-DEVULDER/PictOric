@@ -28,16 +28,14 @@ If you intend to use it in command-line, add the appropriate exes (convert and l
 
 ## Usage 
 
-### from GrafX2
-Simply click on the "Fx" button in the GUI and navigate to the folder where you saved PictOric.lua and select it.
+* *from GrafX2*: Simply click on the "Fx" button in the GUI and navigate to the folder where you saved PictOric.lua and select it. Conversion takes around 20secs usually.
 <img src="http://forum.defence-force.org/download/file.php?id=1727&t=1">
 
-### from the command line
-To run it from the command-line just run
-```<lua-interperter> oric_tst5.lua <filename>.<ext>```
-Where:
-* `<lua-intepreter>` is the lua interpreter you want to use (LuaJIT.exe for instance under windows)
-* `<filename>.<ext>` is the full path to the picture you want to convert
+* *from the command line*: To run it from the command-line just run
+            ```<lua-interperter> oric_tst5.lua <filename>.<ext>```
+  Where:
+  * `<lua-intepreter>` is the lua interpreter you want to use (LuaJIT.exe for instance under windows)
+  * `<filename>.<ext>` is the full path to the picture you want to convert
 	
 ## Discussion
 The discussion about this algorithm takes place on the [Defence-Force forum](http://forum.defence-force.org/viewtopic.php?p=20025#p20025)
@@ -46,7 +44,6 @@ The discussion about this algorithm takes place on the [Defence-Force forum](htt
 <img src="http://forum.defence-force.org/download/file.php?id=1700"> <img src="http://forum.defence-force.org/download/file.php?id=1719">
 <img src="http://forum.defence-force.org/download/file.php?id=1698"> <img src="http://forum.defence-force.org/download/file.php?id=1718">
 <img src="http://forum.defence-force.org/download/file.php?id=1717"> <img src="http://forum.defence-force.org/download/file.php?id=1763">
-<img src="http://forum.defence-force.org/download/file.php?id=1762"> 
 
 <img src="http://forum.defence-force.org/download/file.php?id=1840">
 

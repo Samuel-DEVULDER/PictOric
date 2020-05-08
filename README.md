@@ -37,7 +37,9 @@ If you intend to use it in command-line, add the appropriate exes (convert and l
 * __from the command line__, just run:
   
   ```<lua-interperter> <path-to>PictOric.lua <filename>.<ext>```
-  or if you are running on some linux variant where `lua` is in the `PATH`
+  
+  or if you are running on some linux variant where both `lua` and `PictOric.lua`are on the `$PATH`
+  
   ```PictOric.lua <filename>.<ext>```
   
   where:

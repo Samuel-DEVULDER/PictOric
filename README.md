@@ -28,7 +28,7 @@ If you intend to use it in command-line, add the appropriate exes (convert and l
 
 ## Usage 
 
-* *from GrafX2*, simply click on the "Fx" button in the GUI and navigate to the folder where you saved PictOric.lua and double click on it.
+* *from GrafX2*, simply click on the "Fx" button in the GUI and navigate to the folder where you saved `PictOric.lua` and double click on it.
   
   <img src="http://forum.defence-force.org/download/file.php?id=1775&t=1">
   

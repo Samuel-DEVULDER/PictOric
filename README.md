@@ -20,7 +20,7 @@ Image conversion tool for the [Oric](https://en.wikipedia.org/wiki/Oric) machine
 
 Just copy [PictOric.lua](./PictOric.lua) wherever you want (possibly inside the share/grafx2/scripts folder). 
 
-If you intend to use it in command-line, add the appropriate exes (convert and luajit) next to the lua script. 
+If you intend to use it in command-line, add the appropriate exes (`convert` and `luajit`) in your path or next to the lua script. 
 
 *Notice*: 
 * Windows exes are available in the tools/winb32 folder. Standalone `conver.exe`can also be found inside [that installer](https://imagemagick.org/download/binaries/ImageMagick-7.0.10-10-Q16-x64-static.exe).

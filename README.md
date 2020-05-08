@@ -33,10 +33,10 @@ If you intend to use it in command-line, add the appropriate exes (convert and l
   <img src="http://forum.defence-force.org/download/file.php?id=1727&t=1">
 
 * *from the command line*: 
-  To run it from the command-line just run
-  
-            ```<lua-interperter> oric_tst5.lua <filename>.<ext>```
-  
+  To run it from the command-line just run:
+```
+              <lua-interperter> oric_tst5.lua <filename>.<ext>
+```
   where:
   * `<lua-intepreter>` is the lua interpreter you want to use (LuaJIT.exe for instance under windows)
   * `<filename>.<ext>` is the full path to the picture you want to convert
@@ -54,6 +54,6 @@ The discussion about this algorithm takes place on the [Defence-Force forum](htt
 
 Source | Converted
 ---|----
-<img with="60%" height="70%" src="http://forum.defence-force.org/download/file.php?id=1663&t=1"> | <img src="http://forum.defence-force.org/download/file.php?id=1660">
-<img align="center" with="140%" height="120%" src="http://forum.defence-force.org/download/file.php?id=1678"> | <img src="http://forum.defence-force.org/download/file.php?id=1680">
+<img with="65%" height="65%" src="http://forum.defence-force.org/download/file.php?id=1663&t=1"> | <img src="http://forum.defence-force.org/download/file.php?id=1660">
+<img halign="center" with="135%" height="135%" src="http://forum.defence-force.org/download/file.php?id=1678"> | <img src="http://forum.defence-force.org/download/file.php?id=1680">
 

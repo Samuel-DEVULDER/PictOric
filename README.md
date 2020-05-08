@@ -27,19 +27,20 @@ If you intend to use it in command-line, add the appropriate exes (convert and l
 
 ## Usage 
 
-* *from GrafX2*: Simply click on the "Fx" button in the GUI and navigate to the folder where you saved PictOric.lua and select it.
+* *from GrafX2*, simply click on the "Fx" button in the GUI and navigate to the folder where you saved PictOric.lua and double click on it.
   
   <img src="http://forum.defence-force.org/download/file.php?id=1727&t=1">
   
   Conversion takes typically around 20secs on modern machines (by 2020 standards ;) ).
 
-* *from the command line*: Just run
+* *from the command line*, just run:
   
   ```         <lua-interperter> PictOric.lua <filename>.<ext>```
   
   where:
   * `<lua-intepreter>` is the lua interpreter you want to use (LuaJIT.exe for instance under windows)
-  * `<filename>.<ext>` is the full path to the picture you want to convert
+  * `<filename>.<ext>` is the full path to the picture you want to convert.
+  
   Conversion time is much smaller when using LuaJIT than when using the builtin interpreter of GrafX2.
 	
 ## Discussion
@@ -49,6 +50,7 @@ The discussion about this algorithm takes place on the [Defence-Force forum](htt
 <img src="http://forum.defence-force.org/download/file.php?id=1700"> <img src="http://forum.defence-force.org/download/file.php?id=1719">
 <img src="http://forum.defence-force.org/download/file.php?id=1698"> <img src="http://forum.defence-force.org/download/file.php?id=1718">
 <img src="http://forum.defence-force.org/download/file.php?id=1717"> <img src="http://forum.defence-force.org/download/file.php?id=1763">
+<img src=http://forum.defence-force.org/download/file.php?id=2085"> <img src="http://forum.defence-force.org/download/file.php?id=2084">
 
 Source | Converted
 ---|----

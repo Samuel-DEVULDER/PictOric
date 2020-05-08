@@ -4,7 +4,7 @@
 --
 -- (c) by Samuel DEVULDER (aka __sam__), v1.1 - O2 Oct. 2019
 --
--- To be run in GraphX2 or on cmd-line.
+-- To be run in GrafX2 or on cmd-line.
 --
 -- Usage: lua <this-file> <path/to/img>
 -- 

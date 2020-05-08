@@ -35,7 +35,7 @@ If you intend to use it in command-line, add the appropriate exes (convert and l
 * *from the command line*: 
   To run it from the command-line just run:
   ```
-              <lua-interperter> oric_tst5.lua <filename>.<ext>
+              <lua-interperter> PictOric.lua <filename>.<ext>
   ```
   where:
   * `<lua-intepreter>` is the lua interpreter you want to use (LuaJIT.exe for instance under windows)

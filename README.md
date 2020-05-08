@@ -9,7 +9,7 @@ Image conversion tool for the [Oric](https://en.wikipedia.org/wiki/Oric) machine
 	* basically accepts 24bits uncompressed BMP natively as input,
 	* but can use Image-magick's `convert` tool to support any other types of images.
 * TAP file is created next to the input image.
-* Optionnally:
+* Optionally:
 	* Saves a BMP preview of the converted file next to the TAP file (*on* by default, see code).
 	* Adds a basic loader in the TAP file (*on* by default, see code).\
 	  You just then need to type `CLOAD ""` to load and display the picture on the machine.

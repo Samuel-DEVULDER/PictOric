@@ -15,17 +15,19 @@ Image conversion tool for the Oric machine.
 <img src="http://forum.defence-force.org/download/file.php?id=1672&t=1">
 	
 ## Discussion
-The discussion about this algorithm takes place on the Defence-Force forum:
-http://forum.defence-force.org/viewtopic.php?p=20025#p20025
+The discussion about this algorithm takes place on the [Defence-Force forum](http://forum.defence-force.org/viewtopic.php?p=20025#p20025)
 
 
-## Samples:
+## Samples
+<img src="http://forum.defence-force.org/download/file.php?id=1700"> <img src="http://forum.defence-force.org/download/file.php?id=1719">
+<img src="http://forum.defence-force.org/download/file.php?id=1698"> <img src="http://forum.defence-force.org/download/file.php?id=1718">
+<img src="http://forum.defence-force.org/download/file.php?id=1717"> <img src="http://forum.defence-force.org/download/file.php?id=1763">
+<img src="http://forum.defence-force.org/download/file.php?id=1762"> 
+
+<img src="http://forum.defence-force.org/download/file.php?id=1840">
+
 Source | Converted
 ---|----
 <img src="http://forum.defence-force.org/download/file.php?id=1663&t=1"> | <img src="http://forum.defence-force.org/download/file.php?id=1660">
 <img src="http://forum.defence-force.org/download/file.php?id=1678"> | <img src="http://forum.defence-force.org/download/file.php?id=1680">
 
-<img src="http://forum.defence-force.org/download/file.php?id=1700"> <img src="http://forum.defence-force.org/download/file.php?id=1719">
-<img src="http://forum.defence-force.org/download/file.php?id=1698"> <img src="http://forum.defence-force.org/download/file.php?id=1718">
-<img src="http://forum.defence-force.org/download/file.php?id=1717"> <img src="http://forum.defence-force.org/download/file.php?id=1763">
-<img src="http://forum.defence-force.org/download/file.php?id=1762"> <img src="http://forum.defence-force.org/download/file.php?id=1840">

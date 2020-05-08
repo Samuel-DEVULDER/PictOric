@@ -1,5 +1,5 @@
 # PictOric
-Image conversion tool for the Oric machines.
+Image conversion tool for the [Oric](https://en.wikipedia.org/wiki/Oric) machines.
 
 ## Features
 * Powerful image conversion algorithm adapted to [Oric's gfx constraints](http://osdk.org/index.php?page=articles&ref=ART9).

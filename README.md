@@ -3,16 +3,17 @@ Image conversion tool for the Oric machines.
 
 ## Features
 * Powerful image conversion algorithm adapted to Oric's gfx constraints.
-* Victor Ostromoukhov's error-diffusion coefficients (http://www-perso.iro.umontreal.ca/~ostrom/varcoeffED/SIGGRAPH01_varcoeffED.pdf).
-* Works as GrafX2 External Script.
+* [Victor Ostromoukhov](http://www-perso.iro.umontreal.ca/~ostrom/varcoeffED/SIGGRAPH01_varcoeffED.pdf)'s error-diffusion coefficients.
+* Works as GrafX2 external script.
 * Works in command-line:
 	* accept 24bits uncompressed BMP natively.
 	* uses Image-magick convert tool to accept any input image.
 * TAP file is created next to the input image.
-* Optionnally (on by default, see code) 
-	* saves a BMP preview of the converted file next to the TAP file.
-	* Adds a basic loader in the TAP file. (Just type "CLOAD" to view the picture.)
-<img src="http://forum.defence-force.org/download/file.php?id=1672&t=1">
+* Optionnally:
+	* saves a BMP preview of the converted file next to the TAP file (*on* by default, see code).
+	* Adds a basic loader in the TAP file (*on* by default, see code). You just then need to `CLOAD ""` to view the picture on the oric.
+	* Starts an emulator on the generated TAP file:
+	  <img src="http://forum.defence-force.org/download/file.php?id=1672&t=1">
 
 ## Installation
 

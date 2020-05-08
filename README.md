@@ -6,8 +6,8 @@ Image conversion tool for the Oric machines.
 * [Victor Ostromoukhov](http://www-perso.iro.umontreal.ca/~ostrom/varcoeffED/SIGGRAPH01_varcoeffED.pdf)'s error-diffusion coefficients.
 * Works as GrafX2 external script.
 * Works in command-line:
-	* accept 24bits uncompressed BMP natively.
-	* uses Image-magick convert tool to accept any input image.
+	* Basically accepts 24bits uncompressed BMP natively as input,
+	* But can use Image-magick's `convert` tool to support any other types of images.
 * TAP file is created next to the input image.
 * Optionnally:
 	* saves a BMP preview of the converted file next to the TAP file (*on* by default, see code).

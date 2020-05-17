@@ -18,6 +18,7 @@ local basic_loader = 1      -- 1 to add basic loader to TAP file
 local oric_emul    = ''     -- cmd to run oric emul on tape (or nil/empty)
 local center_x     = 1      -- 0 to disable x-centering
 local center_y     = 1      -- 0 to disable y-centering
+local aic          = 0      -- 1 to enable AIC.
 --
 -------------------------------------------------------------------------------
 
@@ -363,6 +364,10 @@ if type(arg)=='table' and type(arg[1])=='string' then
     end
     function putpicturepixel(x,y,c) end
     function setcolor(i,r,g,b) end
+else
+	local moved, key, mx, my, mb = waitinput(0.1)
+	if (key%128)==113 then aic = 1 end -- presssing 'a' when runnning it under grafx2 forces AIC
+	-- error((moved and "1" or "0").." ".. (key % 128).." ".. mx.." ".. my.." ".. mb.." ".. key)
 end
 
 -- return the Color @(x,y) on the original screen in linear space
@@ -440,6 +445,7 @@ end
 local function info(...)
     local txt = ""
     for _,t in ipairs({...}) do txt = txt .. t end
+	if aic>0 then txt = txt .. " (AIC mode)" end
     statusmessage(txt); 
     if waitbreak(0)==1 then 
         local ok=false
@@ -981,6 +987,8 @@ function mkLine(y,err1)
             if u<t then t,c = u,c+128 end
         end
             
+		if aic<1 or x<=1 then 
+			
         -- ink change
         local v,w = curr:calcErr(7-pap, 7-pap),0
         u = curr:calcErr(pap, pap)
@@ -1004,6 +1012,8 @@ function mkLine(y,err1)
                 end 
             end
         end
+		
+		end -- aic
         
         curr.cache[k] = {t,c}
         return t,c

@@ -13,22 +13,24 @@
 -- be modified in the program. See below:
 --
 -------------------------------------------------------------------------------
-local save_bmp     = 1      -- 1 to save a bmp next to TAP file
-local normalize    = 0.0001 -- % of pixel having max component (0.1-1% typical)
-local blank_margin = -1     -- blank 1st octet of each line? 0=off 1=on -1=auto
-local basic_loader = 1      -- 1 to add basic loader to TAP file
-local oric_emul    = ''     -- cmd to run oric emul on tape (or nil/empty)
-local center_x     = 1      -- 0 to disable x-centering
-local center_y     = 1      -- 0 to disable y-centering
-local aic          = nil    -- nil or array of color pairs
-local ordered      = 0      -- bayer dither order level
+local settings =  {
+	save_bmp     = 1,      -- 1 to save a bmp next to TAP file
+	normalize    = 0.0001, -- % of pixel having max component (0.1-1% typical)
+	blank_margin = -1,     -- blank 1st octet of each line? 0=off 1=on -1=auto
+	basic_loader = 1,      -- 1 to add basic loader to TAP file
+	oric_emul    = '',     -- cmd to run oric emul on tape (or nil/empty)
+	center_x     = 1,      -- 0 to disable x-centering
+	center_y     = 1,      -- 0 to disable y-centering
+	aic          = nil,    -- nil or array of color pairs
+	ordered      = 0,      -- bayer dither order level
+	err_att      = .9980  -- attenuation of error diffusion (1 = no chg)
+}
 -------------------------------------------------------------------------------
 
 -- internal params (do not change)
 local width,height = 240,200-- screen size
 local oric         = 1      -- 0 to disable oric constraints (debug)
-local norm_max     = 1.000  -- max value for normalized component (1 = no chg)
-local err_att      = .9980  -- attenuation of error diffusion (1 = no chg)
+local norm_max     = 1.000  -- max value for settings.normalized component (1 = no chg)
 local dist2_alg    = 1      -- distance algorithm
 
 -- sometimes unpack is not present where I expect it
@@ -48,6 +50,60 @@ local function exist(file)
     local f=io.open(file,binmode("r"))
     if not f then return false else io.close(f); return true; end
 end
+
+-- load/save settings
+function settings:filename()
+	local HOME = os.getenv("USERPROFILE")
+			or   os.getenv("HOME")
+	return HOME and HOME .. "/.pictoric.lua"
+end
+
+function settings:serialize(f, o, tab)
+	local t = type(o)
+	tab = tab or 0
+	if t=='number'  then
+		f:write(o)
+	elseif t=='string' then
+		f:write(string.format("%q", o))
+	elseif t=='table' then
+		f:write("{")
+		local first = true
+		for a,b in pairs(o) do
+			if not(type(b)=="function") then
+				if first then first = false else f:write(",") end
+				f:write("\n"); for i=0,tab do f:write(" ") end
+				if type(a)=="string" then
+					f:write(string.format("%s = ", a))
+				end
+				self:serialize(f, b, tab+1)
+			end
+		end
+		if not first then
+			f:write("\n")
+			for i=1,tab do f:write(" ") end
+		end
+		f:write("}");
+	end
+end
+function settings:save()
+	local name = self:filename()
+	if not name then return end
+	local f = io.open(name, "w")
+	if not f then return end
+	f:write("return ");
+	self:serialize(f,self)
+	f:write("\n")
+	f:close()
+end
+function settings:load()
+	local ok,f = pcall(loadfile(self:filename()))
+	if ok and type(f)=="table" then
+		for a,b in pairs(f) do
+			self[a] = b
+		end
+	end
+end
+settings:load()
 
 -- Make color an object to ease code
 local Color = {}
@@ -269,7 +325,7 @@ function bayer.double(matrix)
 	
 	return r;
 end
--- returns a version of the matrix normalized into  
+-- returns a version of the matrix settings.normalized into  
 -- the 0-1 range
 function bayer.norm(matrix)
 	local m,n=#matrix,#matrix[1]
@@ -290,10 +346,10 @@ function bayer.norm(matrix)
 end
 	
 function Color:extra_op(x,y)
-	if ordered>0 then
+	if settings.ordered>0 then
 		if not bayer.matrix then
 			local m = {{1}} -- aic and {{1}} or {{9,5,6},{4,1,2},{8,3,7}}
-			for i=1,ordered do m = bayer.double(m) end
+			for i=1,settings.ordered do m = bayer.double(m) end
 			bayer.matrix = bayer.norm(m)
 			bayer.w = #bayer.matrix[1]
 			bayer.h = #bayer.matrix
@@ -354,7 +410,7 @@ local function read_bmp24(file)
     end
     
     local norm = nil
-    if normalize>0 then
+    if settings.normalize>0 then
         local histo = {}
         for i=0,255 do histo[i] = 0 end
         for i=1,biHeight*4*math.floor((biWidth*biBitCount/8 + 3)/4),4 do
@@ -364,7 +420,7 @@ local function read_bmp24(file)
             histo[t] = histo[t]+1
         end
         local acc,thr = 0,0
-        for i=0,255 do thr = thr + histo[i]*normalize end
+        for i=0,255 do thr = thr + histo[i]*settings.normalize end
         for i=255,0,-1 do
             acc = acc + histo[i]
             if not norm and acc>=thr then
@@ -396,7 +452,7 @@ end
 
 -- cmdline support
 if type(arg)=='table' and type(arg[1])=='string' then 
-    local filename = arg[1]
+    local filename = arg[1]:gsub('^/cygdrive/(%w)/','%1:/')
     local dir,name=filename:match("(.-)([^\\/]+)$");
     if name:lower():match("%.map$") or
        name:lower():match("%.tap$") then os.exit(0) end
@@ -415,17 +471,18 @@ if type(arg)=='table' and type(arg[1])=='string' then
     function statusmessage(msg) 
         local txt = name .. ': ' .. msg
         if txt:len()>79 then txt="..." .. txt:sub(-76) else txt = txt .. string.rep(' ', 79-txt:len()) end
-        io.stderr:write(txt .. '\r') 
+        io.stderr:write(txt .. (msg:find("time")==1 and '\n' or '\r'))
         io.stderr:flush() 
     end
     function selectbox(msg, yes, cb) cb() end
     function setpicturesize(w,h) 
         -- io.stderr:write(string.rep(' ',79) .. '\r') 
-        io.stderr:write('\n')
+        -- io.stderr:write('\n')
         io.stderr:flush() 
     end
     function putpicturepixel(x,y,c) end
     function setcolor(i,r,g,b) end
+	function updatescreen() end
 else
 	local moved, key, mx, my, mb = waitinput(0.2)
 	local keycode = "s"
@@ -433,28 +490,43 @@ else
 	
 	if (key%128) == keycode:byte(1) then -- '=' pressed
 		local ok, do_aic, aic1, aic2, sort
+		if settings.aic or settings.aic_ then
+			local p1p2,p2p1
+			for _,p in ipairs(settings.aic or settings.aic_) do
+				aic1 = (aic1==p[1] and aic1) or (aic1 and 0) or p[1]
+				aic2 = (aic2==p[2] and aic2) or (aic2 and 0) or p[2]
+				p1p2 = p1p2 or (p[1]<p[2] and 1)
+				p2p1 = p2p1 or (p[2]<p[1] and 1)
+			end
+			sort = (p1p2 or 0) - (p2p1 or 0)
+		end
 		
-		do_aic = 1
-		ok, do_aic, ordered, aic1, aic2, sort, err_att = inputbox('Settings for PictOric',
-			'AIC Mode',do_aic,0,1,0,
-			'Ordered Dither    (0=off)',2,0,5,0,
-			'Odd lines color  (0=auto)',0,0,6,0,
-			'Even lines color (0=auto)',0,0,6,0,
-			'Odd <= Even  (0=no order)',0,-1,1,0,
-			'Error damping', do_aic and 0.7 or err_att, 0,1,3)
+		ok, do_aic, settings.ordered, aic1, aic2, sort, settings.err_att = inputbox(
+			'Settings for PictOric',
+			'AIC Mode',settings.aic and 1 or 0,0,1,0,
+			'Ordered Dither    (0=off)',settings.ordered,0,5,0,
+			'Odd lines color  (0=auto)',aic1 or 0,0,6,0,
+			'Even lines color (0=auto)',aic2 or 0,0,6,0,
+			'Odd <= Even  (0=no order)',sort or 0,-1,1,0,
+			'Error damping', settings.err_att, 0,1,3)
 		if ok then
 			if do_aic>0 then
-				aic = {}
+				settings.aic_ = nil
+				settings.aic  = {}
 				local c1 = aic1>0 and {aic1} or {1,2,3,4,5,6}
 				local c2 = aic2>0 and {aic2} or {1,2,3,4,5,6}
 				for _,a in ipairs(c1) do
 					for _,b in ipairs(c2) do
 						if aic1+aic2>0 or 0<=(b-a)*sort then 
-							table.insert(aic, {a,b})
+							table.insert(settings.aic, {a,b})
 						end
 					end
 				end
+			else
+				settings.aic_ = settings.aic
+				settings.aic  = nil
 			end
+			settings:save()
 		else
 			return
 		end
@@ -468,7 +540,7 @@ if not getLinearPictureColor then
         if _getLinearPictureColor==nil then
             _getLinearPictureColor = {}
             for i=0,255 do _getLinearPictureColor[i] = Color:new(getbackupcolor(i)):toLinear(); end
-            if normalize>0 then
+            if settings.normalize>0 then
                 local histo = {}
                 for i=0,255 do histo[i] = 0 end
                 for y=0,screen_h-1 do
@@ -479,7 +551,7 @@ if not getLinearPictureColor then
                         histo[b] = histo[b]+1
                     end
                 end
-                local acc,thr=0,normalize*screen_h*screen_w*3
+                local acc,thr=0,settings.normalize*screen_h*screen_w*3
                 local norm
                 for i=255,0,-1 do
                     acc = acc + histo[i]
@@ -553,13 +625,13 @@ local function to_screen(x,y)
     if screen_w/screen_h < width/height then
         i = x*screen_h/height
         j = y*screen_h/height
-        if center_x>0 then
+        if settings.center_x>0 then
             i = i + (screen_w - width*screen_h/height)/2 -- center
         end
     else
         i = x*screen_w/width
         j = y*screen_w/width
-        if center_y>0 then
+        if settings.center_y>0 then
             j = j + (screen_h - height*screen_w/width)/2 -- center
         end
     end
@@ -570,7 +642,7 @@ end
 -- corresonding to the other platform screen
 local _getLinearPixel = {} -- cache
 local function getLinearPixel(x,y)
-    if blank_margin>0 and x<6 then return Color:new() end 
+    if settings.blank_margin>0 and x<6 then return Color:new() end 
     local k=x+y*width
     local p = _getLinearPixel and _getLinearPixel[k]
     if not p then
@@ -595,7 +667,7 @@ local function getLinearPixel(x,y)
 end
 
 -- auto determine if 1st 6 pixels are to be left blank or not
-if blank_margin<0 then
+if settings.blank_margin<0 then
     -- 5% abs tolerance as determined by this picture:
     -- https://upload.wikimedia.org/wikipedia/en/3/39/Space1999_Year1_Title.jpg
     local TOL=5/100
@@ -628,7 +700,7 @@ if blank_margin<0 then
         end
     end end
 
-    blank_margin = ok and 0 or 1
+    settings.blank_margin = ok and 0 or 1
 end
 
 -- Victor Ostromoukhov dithering
@@ -898,14 +970,14 @@ local function mkOstro()
         local z=(i-1)/(#t-1)
         local a,b,c = t[i],t[i+1],t[i+2]
         local d = 
-            -- (1+(err_att-1)*math.exp(1-1/z))/(a+b+c)
-            -- (1+(err_att-1)*z)/(a+b+c)
+            -- (1+(settings.err_att-1)*math.exp(1-1/z))/(a+b+c)
+            -- (1+(settings.err_att-1)*z)/(a+b+c)
             1/(a+b+c)
         table.insert(o, {a*d, b*d, c*d})
     end
     o.diffuse = function(self, col, err, err0, err1, err2)
         local z = math.max(col.r, col.g, col.b)
-        z = (1+(err_att-1)*z)
+        z = (1+(settings.err_att-1)*z)
         -------------------------------------------------------
         -- __sam__'s idea #1: modulate the error:
         --
@@ -997,8 +1069,6 @@ function mkErr(w)
     end
     return e
 end
--- current-line error / next-line error
-local err1,err2 = mkErr(width),mkErr(width)
 
 -- __sam__'s idea #2: Neglect cross-octer error to speed everything
 -- up.
@@ -1151,10 +1221,14 @@ function optim(y, err1, aic)
     return line
 end
 
+-- current-line error / next-line error
+local err1,err2 = mkErr(width),mkErr(width)
+
 function dither(callback, min_thr, aic)
 	local tot = 0
 	local res = {}
 	local buf = ''
+	err1:clear()
 	for i=1,width*height do res[i]=0 end
 	for y=0,height-1 do
 		-- info(string.format("%2d%%", math.floor(100*y/height)))  
@@ -1203,7 +1277,7 @@ function dither(callback, min_thr, aic)
 			-- store chosen color for later display on screen or
 			-- in BMP file
 			res[y*width + x + 1] = c
-			e:sub(pal[c])
+			e:sub(pal[c]):extra_op(x,y)
 			-- Ostromoukhov's diffusion
 			ostro:diffuse(p, e, err1[x+xs], err2[x-xs], err2[x])
 		end
@@ -1225,10 +1299,10 @@ end
 -- convert full picture
 local start = os.clock()
 local extra,tot,res,buf=''
-if aic then
+if settings.aic then
 	tot = 1E300
-	for n,pair in ipairs(aic) do
-		local t,r,b = dither(function(x) return string.format("%2d%% (AIC Mode)", math.floor(100*(x + (n-1))/#aic)) end, tot, pair)
+	for n,pair in ipairs(settings.aic) do
+		local t,r,b = dither(function(x) return string.format("%2d%% (AIC Mode)", math.floor(100*(x + (n-1))/#settings.aic)) end, tot, pair)
 		if t<tot then 
 			tot,res,buf = t,r,b 
 			extra = ' AIC=' .. pair[1] .. ',' .. pair[2]
@@ -1241,12 +1315,14 @@ else
 end
 
 -- makes the conveted images the new image
-setpicturesize(width,height)
-pal:disp()
-for i,v in ipairs(res) do
-    putpicturepixel((i-1)%width,math.floor((i-1)/width),v)
+if res then
+	setpicturesize(width,height)
+	pal:disp()
+	for i,v in ipairs(res) do
+		putpicturepixel((i-1)%width,math.floor((i-1)/width),v)
+	end
+	updatescreen()
 end
-updatescreen()
 
 -- done! display some info
 info("time="..(math.floor(.5 + 100*(os.clock()-start))/100).."s"..extra)
@@ -1266,7 +1342,7 @@ if oric>0 then
         -- http://caca.zoy.org/browser/libpipi/trunk/pipi/codec/oric.c
         local out = assert(io.open(fullname,binmode("w")))
         
-        if basic_loader>0 then
+        if settings.basic_loader>0 then
         -- write basic stub: 10 PAPER0:INK7:HIRES:CLOAD""
         out:write(string.char(0x16,0x16,0x16,0x16,0x24,
           0xff,0xff,0x00,0xc7,0x05,0x13,0x05,0x01,0xff,
@@ -1283,7 +1359,7 @@ if oric>0 then
         out:close()
         
         -- save BMP file for easy view of content under a file browser
-        if save_bmp>0 then
+        if settings.save_bmp>0 then
             local bitmap = ''
             for y=height-1,0,-1 do
                 local t = {}
@@ -1311,8 +1387,8 @@ if oric>0 then
         end
     
         -- optionnaly run and emulator on the generated tap
-        if oric_emul and not(oric_emul=='') then
-            os.execute(oric_emul .. ' ' .. fullname)
+        if settings.oric_emul and not(settings.oric_emul=='') then
+            os.execute(settings.oric_emul .. ' ' .. fullname)
         end
     end
 end

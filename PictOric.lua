@@ -1,6 +1,6 @@
 --Converts true color images for Oric platforms.
---Press "c" while clicking "Run" for AIC mode.
---v1.2 - 2020 - by Samuel "__sam__" DEVULDER
+--Press "s" while clicking "Run" for settings.
+--v1.3 - 2020 - by Samuel "__sam__" DEVULDER
 -------------------------------------------------------------------------------
 --
 -- (c) by Samuel DEVULDER (aka __sam__), 2019-2020
@@ -21,6 +21,7 @@ local oric_emul    = ''     -- cmd to run oric emul on tape (or nil/empty)
 local center_x     = 1      -- 0 to disable x-centering
 local center_y     = 1      -- 0 to disable y-centering
 local aic          = nil    -- nil or array of color pairs
+local ordered      = 0      -- bayer dither order level
 -------------------------------------------------------------------------------
 
 -- internal params (do not change)
@@ -243,6 +244,66 @@ function Color.dE2000(col1,col2)
                  (dCp / (kC*sC))*(dHp / (kH*sH))*rT )
 end
 
+-- bayer dithering support
+local bayer = {}
+function bayer.double(matrix)
+	local m,n=#matrix,#matrix[1]
+	local r = {}
+	for j=1,m*2 do
+		local t = {}
+		for i=1,n*2 do t[i]=0; end
+		r[j] = t;
+	end
+	
+	-- 0 3
+	-- 2 1
+	for j=1,m do
+		for i=1,n do
+			local v = 4*matrix[j][i]
+			r[m*0+j][n*0+i] = v-3
+			r[m*1+j][n*1+i] = v-2
+			r[m*1+j][n*0+i] = v-1
+			r[m*0+j][n*1+i] = v-0
+		end
+	end
+	
+	return r;
+end
+-- returns a version of the matrix normalized into  
+-- the 0-1 range
+function bayer.norm(matrix)
+	local m,n=#matrix,#matrix[1]
+	local max,ret = 0,{}
+	for j=1,m do
+		for i=1,n do
+			max = math.max(max,matrix[j][i])
+		end
+	end
+	max=max+1
+	for j=1,m do
+		ret[j] = {}
+		for i=1,n do
+			ret[j][i]=matrix[j][i]/max
+		end
+	end
+	return ret
+end
+	
+function Color:extra_op(x,y)
+	if ordered>0 then
+		if not bayer.matrix then
+			local m = {{1}} -- aic and {{1}} or {{9,5,6},{4,1,2},{8,3,7}}
+			for i=1,ordered do m = bayer.double(m) end
+			bayer.matrix = bayer.norm(m)
+			bayer.w = #bayer.matrix[1]
+			bayer.h = #bayer.matrix
+		end
+		local d = bayer.matrix[1+(y % bayer.h)][1+(x % bayer.w)]
+		self:map(function(x) return math.floor(x+d) end)
+	end
+	return self
+end
+
 -- support for bmp (https://www.gamedev.net/forums/topic/572784-lua-read-bitmap/)
 local function read_bmp24(file) 
     if not file then return nil end
@@ -367,24 +428,30 @@ if type(arg)=='table' and type(arg[1])=='string' then
     function setcolor(i,r,g,b) end
 else
 	local moved, key, mx, my, mb = waitinput(0.2)
-	local keycode = "c"
+	local keycode = "s"
 	-- error((moved and "1" or "0").." ".. (key % 128).." ".. mx.." ".. my.." ".. mb.." ".. key)
 	
 	if (key%128) == keycode:byte(1) then -- '=' pressed
-		local ok, aic1, aic2, ordered
-		ok, aic1, aic2, err_att, ordered = inputbox('AIC Mode',
+		local ok, do_aic, aic1, aic2, sort
+		
+		do_aic = 1
+		ok, do_aic, ordered, aic1, aic2, sort, err_att = inputbox('Settings for PictOric',
+			'AIC Mode',do_aic,0,1,0,
+			'Ordered Dither    (0=off)',2,0,5,0,
 			'Odd lines color  (0=auto)',0,0,6,0,
 			'Even lines color (0=auto)',0,0,6,0,
-			'Error damping', 0.7, 0,1,3,
-			'Odd <= Even (0=no order)',0,-1,1,0)
+			'Odd <= Even  (0=no order)',0,-1,1,0,
+			'Error damping', do_aic and 0.7 or err_att, 0,1,3)
 		if ok then
-			local c1 = aic1>0 and {aic1} or {1,2,3,4,5,6}
-			local c2 = aic2>0 and {aic2} or {1,2,3,4,5,6}
-			aic = {}
-			for _,a in ipairs(c1) do
-				for _,b in ipairs(c2) do
-					if aic1+aic2>0 or 0<=(b-a)*ordered then 
-						table.insert(aic, {a,b})
+			if do_aic>0 then
+				aic = {}
+				local c1 = aic1>0 and {aic1} or {1,2,3,4,5,6}
+				local c2 = aic2>0 and {aic2} or {1,2,3,4,5,6}
+				for _,a in ipairs(c1) do
+					for _,b in ipairs(c2) do
+						if aic1+aic2>0 or 0<=(b-a)*sort then 
+							table.insert(aic, {a,b})
+						end
 					end
 				end
 			end
@@ -971,7 +1038,7 @@ function mkLine(y,err1)
                     local e = Color:new()
                     for x=self.i*6,self.i*6+5 do
                         local p = getLinearPixel(x,line.y)
-                        e:add(line.err1[x]):add(p)
+                        e:add(line.err1[x]):add(p):extra_op(x,y)
                         local c = fg
                         local d = dist2(e, c)
                         if bg~=fg then
@@ -1100,7 +1167,7 @@ function dither(callback, min_thr, aic)
 		for x=x0,x1,xs do
 			local p = getLinearPixel(x,y)
 			local e = err1[x]
-			e:add(p)
+			e:add(p):extra_op(x,y)
 			local c
 			if line then
 				-- oric constaints

@@ -1,8 +1,9 @@
-#!/usr/bin/env lua
+--Converts true color images for Oric platforms.
+--Press "c" while clicking "Run" for AIC mode.
+--v1.2 - 2020 - by Samuel "__sam__" DEVULDER
 -------------------------------------------------------------------------------
--- Conversion of true color pictures into Oric format.
 --
--- (c) by Samuel DEVULDER (aka __sam__), v1.1 - O2 Oct. 2019
+-- (c) by Samuel DEVULDER (aka __sam__), 2019-2020
 --
 -- To be run in GrafX2 or on cmd-line.
 --
@@ -11,6 +12,7 @@
 -- Convert img to an oric TAP file next to it. There are few params that can
 -- be modified in the program. See below:
 --
+-------------------------------------------------------------------------------
 local save_bmp     = 1      -- 1 to save a bmp next to TAP file
 local normalize    = 0.0001 -- % of pixel having max component (0.1-1% typical)
 local blank_margin = -1     -- blank 1st octet of each line? 0=off 1=on -1=auto
@@ -18,8 +20,7 @@ local basic_loader = 1      -- 1 to add basic loader to TAP file
 local oric_emul    = ''     -- cmd to run oric emul on tape (or nil/empty)
 local center_x     = 1      -- 0 to disable x-centering
 local center_y     = 1      -- 0 to disable y-centering
-local aic          = 0      -- 1 to enable AIC.
---
+local aic          = nil    -- nil or array of color pairs
 -------------------------------------------------------------------------------
 
 -- internal params (do not change)
@@ -365,9 +366,32 @@ if type(arg)=='table' and type(arg[1])=='string' then
     function putpicturepixel(x,y,c) end
     function setcolor(i,r,g,b) end
 else
-	local moved, key, mx, my, mb = waitinput(0.1)
-	if (key%128)==113 then aic = 1 end -- presssing 'a' when runnning it under grafx2 forces AIC
+	local moved, key, mx, my, mb = waitinput(0.2)
+	local keycode = "c"
 	-- error((moved and "1" or "0").." ".. (key % 128).." ".. mx.." ".. my.." ".. mb.." ".. key)
+	
+	if (key%128) == keycode:byte(1) then -- '=' pressed
+		local ok, aic1, aic2, ordered
+		ok, aic1, aic2, err_att, ordered = inputbox('AIC Mode',
+			'Odd lines color  (0=auto)',0,0,6,0,
+			'Even lines color (0=auto)',0,0,6,0,
+			'Error damping', 0.7, 0,1,3,
+			'Odd <= Even (0=no order)',0,-1,1,0)
+		if ok then
+			local c1 = aic1>0 and {aic1} or {1,2,3,4,5,6}
+			local c2 = aic2>0 and {aic2} or {1,2,3,4,5,6}
+			aic = {}
+			for _,a in ipairs(c1) do
+				for _,b in ipairs(c2) do
+					if aic1+aic2>0 or 0<=(b-a)*ordered then 
+						table.insert(aic, {a,b})
+					end
+				end
+			end
+		else
+			return
+		end
+	end
 end
 
 -- return the Color @(x,y) on the original screen in linear space
@@ -443,10 +467,6 @@ end
 
 -- prints info
 local function info(...)
-    local txt = ""
-    for _,t in ipairs({...}) do txt = txt .. t end
-	if aic>0 then txt = txt .. " (AIC mode)" end
-    statusmessage(txt); 
     if waitbreak(0)==1 then 
         local ok=false
         selectbox("Abort ?", "Yes", function() ok = true end, "No", function() ok = false end)
@@ -455,7 +475,9 @@ local function info(...)
             -- error('Operation aborted') 
         end
     end
-    
+    local txt = ""
+    for _,t in ipairs({...}) do txt = txt .. t end
+    statusmessage(txt)    
 end
 
 -- convert oric coordinate into screen coordinate
@@ -968,7 +990,22 @@ function mkLine(y,err1)
             end
         }
     end
-    -- recursively searcdhe for the lest error over the line.
+	
+	function line:aic(x, ink, paper)
+		if x==0 then
+			return 0,ink
+		else 
+			local e = self[x]:calcErr(ink,paper)
+			local f = self[x]:calcErr(7-ink,7-paper)
+			if e<=f then 
+				return e,64
+			else
+				return f,128+64
+			end
+		end
+	end
+	
+	-- recursively searcdhe for the lest error over the line.
     -- return a couple (least-error, best attribute-cmd for octet x in current line)
     function line:findRec(x, ink, pap) 
         -- done ? (no attribute-cmd in that case)
@@ -987,8 +1024,6 @@ function mkLine(y,err1)
             if u<t then t,c = u,c+128 end
         end
             
-		if aic<1 or x<=1 then 
-			
         -- ink change
         local v,w = curr:calcErr(7-pap, 7-pap),0
         u = curr:calcErr(pap, pap)
@@ -1013,8 +1048,6 @@ function mkLine(y,err1)
             end
         end
 		
-		end -- aic
-        
         curr.cache[k] = {t,c}
         return t,c
     end
@@ -1023,13 +1056,18 @@ end
 
 -- optimize line y of the picture. Errors comming from upper row
 -- are in err1
-function optim(y, err1) 
+function optim(y, err1, aic) 
     local line = mkLine(y,err1)
     if running>0 then
-        local ink,pap = 7,0     
+		local ink,pap = 7,0     
+		local srch = line.findRec
+        if aic then
+			ink = aic[1 + (y%2)]
+			srch = line.aic
+		end
         for x=0,w39 do
             -- for each octet get best attribvute-cmd
-            local i,_,c = false, line:findRec(x,ink,pap)
+            local i,_,c = false, srch(line,x,ink,pap)
             line[x].cmd = c -- store the attribute
             -- and update bg/fg accordingly
             if c>=128 then c,i = c-128,true end
@@ -1046,73 +1084,105 @@ function optim(y, err1)
     return line
 end
 
+function dither(callback, min_thr, aic)
+	local tot = 0
+	local res = {}
+	local buf = ''
+	for i=1,width*height do res[i]=0 end
+	for y=0,height-1 do
+		-- info(string.format("%2d%%", math.floor(100*y/height)))  
+		if callback then info(callback(y/height)) end
+		-- find best line
+		local line = oric>0 and optim(y,err1, aic)
+		local x0,x1,xs = 0,width-1,1
+		-- use serpentine
+		if y%2==1 then x0,x1,xs = x1,x0,-xs end
+		for x=x0,x1,xs do
+			local p = getLinearPixel(x,y)
+			local e = err1[x]
+			e:add(p)
+			local c
+			if line then
+				-- oric constaints
+				local cmd = line[math.floor(x/6)]
+				-- notice that at this point we can dither without decoding
+				-- cmd because bg/fg already contains the two available colors
+				-- for the current pixel.
+				local d1,d2 = dist2(e,pal[cmd.fg]),dist2(e,pal[cmd.bg])
+				if d1<=d2 then
+					c = cmd.fg
+					tot = tot + d1
+					if (cmd.cmd % 128)>=64 then
+						cmd.cmd = cmd.cmd + 2^(5-(x%6))
+					end
+				else
+					c = cmd.bg
+					tot = tot + d2
+				end
+			else
+				-- no constaints. This allows comparing result
+				-- between theoric (pun intended) error, and the error
+				-- obtained by this algorithm.
+				c=0
+				local d=dist2(e,pal[c])
+				for i=1,7 do
+					local t=dist2(e,pal[i])
+					if t<d then c,d = i,t end
+				end
+				-- total error
+				tot = tot + d
+			end
+			
+			-- store chosen color for later display on screen or
+			-- in BMP file
+			res[y*width + x + 1] = c
+			e:sub(pal[c])
+			-- Ostromoukhov's diffusion
+			ostro:diffuse(p, e, err1[x+xs], err2[x-xs], err2[x])
+		end
+		-- prepare error for next line
+		err1,err2 = err2,err1
+		err2:clear()
+		if oric>0 then
+			-- add current line into buffer for tap file
+			local lbuf = {}
+			for i=0,w39 do lbuf[i+1] =line[i].cmd end
+			buf = buf .. string.char(unpack(lbuf))
+		end
+		if min_thr and tot>min_thr then break end
+	end
+	
+	return tot,res,buf
+end	
+
 -- convert full picture
 local start = os.clock()
-local tot = 0
-local res = {}
-local buf = ''
-for i=1,width*height do res[i]=0 end
-for y=0,height-1 do
-    info(string.format("%2d%%", math.floor(100*y/height)))  
-    -- find best line
-    local line = oric>0 and optim(y,err1)
-    local x0,x1,xs = 0,width-1,1
-    -- use serpentine
-    if y%2==1 then x0,x1,xs = x1,x0,-xs end
-    for x=x0,x1,xs do
-        local p = getLinearPixel(x,y)
-        local e = err1[x]
-        e:add(p)
-        local c
-        if line then
-            -- oric constaints
-            local cmd = line[math.floor(x/6)]
-            -- notice that at this point we can dither without decoding
-            -- cmd because bg/fg already contains the two available colors
-            -- for the current pixel.
-            local d1,d2 = dist2(e,pal[cmd.fg]),dist2(e,pal[cmd.bg])
-            if d1<=d2 then
-                c = cmd.fg
-                tot = tot + d1
-                if (cmd.cmd % 128)>=64 then
-                    cmd.cmd = cmd.cmd + 2^(5-(x%6))
-                end
-            else
-                c = cmd.bg
-                tot = tot + d2
-            end
-        else
-            -- no constaints. This allows comparing result
-            -- between theoric (pun intended) error, and the error
-            -- obtained by this algorithm.
-            c=0
-            local d=dist2(e,pal[c])
-            for i=1,7 do
-                local t=dist2(e,pal[i])
-                if t<d then c,d = i,t end
-            end
-            -- total error
-            tot = tot + d
-        end
-        -- store chosen color for later display on screen or
-        -- in BMP file
-        res[y*width + x + 1] = c
-        e:sub(pal[c])
-        -- Ostromoukhov's diffusion
-        ostro:diffuse(p, e, err1[x+xs], err2[x-xs], err2[x])
-    end
-    -- prepare error for next line
-    err1,err2 = err2,err1
-    err2:clear()
-    if oric>0 then
-        -- add current line into buffer for tap file
-        local lbuf = {}
-        for i=0,w39 do lbuf[i+1] =line[i].cmd end
-        buf = buf .. string.char(unpack(lbuf))
-    end
+local extra,tot,res,buf=''
+if aic then
+	tot = 1E300
+	for n,pair in ipairs(aic) do
+		local t,r,b = dither(function(x) return string.format("%2d%% (AIC Mode)", math.floor(100*(x + (n-1))/#aic)) end, tot, pair)
+		if t<tot then 
+			tot,res,buf = t,r,b 
+			extra = ' AIC=' .. pair[1] .. ',' .. pair[2]
+		end
+		if running==0 then break end
+	end
+else
+	tot,res,buf = dither(function(x) return string.format("%2d%%", math.floor(100*x)) end)
+	extra = extra .. " err="..math.floor(.5 + tot^.5)
 end
+
+-- makes the conveted images the new image
+setpicturesize(width,height)
+pal:disp()
+for i,v in ipairs(res) do
+    putpicturepixel((i-1)%width,math.floor((i-1)/width),v)
+end
+updatescreen()
+
 -- done! display some info
-info("time="..(math.floor(.5 + 100*(os.clock()-start))/100).."s err="..math.floor(.5 + tot^.5))
+info("time="..(math.floor(.5 + 100*(os.clock()-start))/100).."s"..extra)
 
 -- write TAP (& BMP) file(s)
 if oric>0 then
@@ -1179,88 +1249,3 @@ if oric>0 then
         end
     end
 end
-
--- makes the conveted images the new image
-setpicturesize(width,height)
-pal:disp()
-for i,v in ipairs(res) do
-    putpicturepixel((i-1)%width,math.floor((i-1)/width),v)
-end
-
-
---------------------------------------------------------------
--- extrra stuff kept there for later use, maybe
----
--- finalizepicture()
---[[
--- file = io.open('C:/Users/Utilisateur/Downloads/einst.tap','r')
-file = io.open('C:/Users/Utilisateur/Downloads/output.tap','r')
-
-data = file:read('*a')
-file:close()
-
-s=0
-i=1
-t=''
-while i<=data:len() and s~=11 do
-    local b = data:byte(i)
-    -- messagebox(s)
-    if s==0 then
-        s = b==0x24 and 1 or b==0x16 and s or -1
-    elseif s==1 then 
-        s = b==0x00 and 2 or -1
-    elseif s==2 then
-        s= b==0xff and 3 or -1
-    elseif s==3 then
-        s=b==0x80 and 4 or -1
-    elseif s==4 then
-        s = b==0x00 and 5 or -1
-    elseif s==5 then
-        s = b==0xbf and 6 or -1
-    elseif s==6 then
-        s = b==0x3f and 7 or -1
-    elseif s==7 then
-        s = b==0xa0 and 8 or -1
-    elseif s==8 then
-        s = b==0x00 and 9 or -1
-    elseif s==9 then
-        s = 10
-    elseif s==10 then
-        s = b==0x00 and 11 or s
-    else
-        error('invalid tap file at offset: ' .. i)
-    end
-    if (s==9 or s==10) and b~=0 then
-        t = t..string.char(b)
-    end
-    i = i + 1
-end
-messagebox(t)
-
-for y=0,199 do
-    local paper,ink=0,7
-    for x=0,39 do
-        local b,z = data:byte(i),false i=i+1
-        if b>=128 then b,z=b-128,true end
-        if b<64 then
-            if b<8 then
-                ink = b
-            elseif b>=16 and b<24 then
-                paper = b-16
-            end
-            b = 0
-        else
-            b = b - 64
-        end
-        for x2=x*6,x*6+5 do
-            if b>=32 then
-                b = 2*(b-32)
-                putpicturepixel(x2,y,z and 7-ink or ink)
-            else
-                b = 2*b
-                putpicturepixel(x2,y,z and 7-paper or paper)
-            end
-        end
-    end
-end
-]]--

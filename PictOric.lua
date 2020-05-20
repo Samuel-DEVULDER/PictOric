@@ -1,5 +1,5 @@
 --Converts true color images for Oric platforms.
---Press "s" while clicking "Run" for settings.
+--Press "x" while clicking "Run" for settings.
 --v1.3 - 2020 - by Samuel "__sam__" DEVULDER
 -------------------------------------------------------------------------------
 --
@@ -13,25 +13,34 @@
 -- be modified in the program. See below:
 --
 -------------------------------------------------------------------------------
-local settings =  {
-	save_bmp     = 1,      -- 1 to save a bmp next to TAP file
-	normalize    = 0.0001, -- % of pixel having max component (0.1-1% typical)
-	blank_margin = -1,     -- blank 1st octet of each line? 0=off 1=on -1=auto
-	basic_loader = 1,      -- 1 to add basic loader to TAP file
-	oric_emul    = '',     -- cmd to run oric emul on tape (or nil/empty)
-	center_x     = 1,      -- 0 to disable x-centering
-	center_y     = 1,      -- 0 to disable y-centering
-	aic          = nil,    -- nil or array of color pairs
-	ordered      = 0,      -- bayer dither order level
-	err_att      = .9980  -- attenuation of error diffusion (1 = no chg)
-}
+local settings =  {reset=function(_)
+	_.save_bmp     = 1      -- 1 to save a bmp next to TAP file
+	_.normalize    = 0.0001 -- % of pixel having max component (0.1-1% typical)
+	_.blank_margin = -1     -- blank 1st octet of each line? 0=off 1=on -1=auto
+	_.basic_loader = 1      -- 1 to add basic loader to TAP file
+	_.oric_emul    = ''     -- cmd to run oric emul on tape (or nil/empty)
+	_.center_x     = 1      -- 0 to disable x-centering
+	_.center_y     = 1      -- 0 to disable y-centering
+	_.aic          = 0      -- 1 to enable aic
+	_.aic_co       = 0      -- aic color order constraint (-1,0,1)
+	_.aic_c1       = 0      -- aic color #1
+	_.aic_c2       = 0      -- aic color #2
+	_.err_att      = .9980  -- attenuation of error diffusion (1 = no chg)
+	_.dist2_alg    = 1      -- distance algorithm 1..4
+	_.dither_lvl   = 0      -- bayer dither order level 
+	_.dither_mat   = {
+	[6] = {{9,1,3},
+	       {5,7,11},
+		   {10,2,4},
+		   {6,8,12}}
+	}     -- extra dithering matrix
+end}
 -------------------------------------------------------------------------------
 
 -- internal params (do not change)
 local width,height = 240,200-- screen size
 local oric         = 1      -- 0 to disable oric constraints (debug)
 local norm_max     = 1.000  -- max value for settings.normalized component (1 = no chg)
-local dist2_alg    = 1      -- distance algorithm
 
 -- sometimes unpack is not present where I expect it
 local unpack       = unpack or table.unpack 
@@ -58,30 +67,56 @@ function settings:filename()
 	return HOME and HOME .. "/.pictoric.lua"
 end
 
-function settings:serialize(f, o, tab)
+function settings:serialize(f, o, indent)
 	local t = type(o)
-	tab = tab or 0
+	indent = indent or 0
 	if t=='number'  then
 		f:write(o)
 	elseif t=='string' then
 		f:write(string.format("%q", o))
 	elseif t=='table' then
-		f:write("{")
-		local first = true
+		local keys = {}
 		for a,b in pairs(o) do
-			if not(type(b)=="function") then
-				if first then first = false else f:write(",") end
-				f:write("\n"); for i=0,tab do f:write(" ") end
-				if type(a)=="string" then
-					f:write(string.format("%s = ", a))
-				end
-				self:serialize(f, b, tab+1)
+			if type(a)=="string" then table.insert(keys, a) end
+		end
+		table.sort(keys)
+		for a,b in pairs(o) do
+			if type(a)~="string" then table.insert(keys, a) end
+		end
+		f:write("{")
+		local first,idx,cr,cr2 = true,1,false,false
+		local function tab()
+			if cr then
+				cr = false
+				f:write("\n"); 
+				for i=0,indent do f:write("\t") end
 			end
 		end
-		if not first then
-			f:write("\n")
-			for i=1,tab do f:write(" ") end
+		for _,a in ipairs(keys) do
+			local b = o[a]
+			if not(type(b)=="function") then
+				if first then 
+					first = false 
+					if a~=1 then cr,cr2 = true,true end
+				else 
+					f:write(",") 
+				end
+				tab()
+				if type(a)=="string" then					
+					f:write(string.format("%s = ", a))
+					cr = true
+				elseif idx ~= a then
+					f:write("[")
+					self:serialize(f, a, 0)
+					f:write("] = ");
+					cr = true
+				end
+				self:serialize(f, b, indent+1)
+			end
+			idx = idx + 1
 		end
+		indent,cr = indent - 1,cr2
+		tab()
 		f:write("}");
 	end
 end
@@ -89,11 +124,13 @@ function settings:save()
 	local name = self:filename()
 	if not name then return end
 	local f = io.open(name, "w")
-	if not f then return end
-	f:write("return ");
-	self:serialize(f,self)
-	f:write("\n")
-	f:close()
+	if f then 
+		f:write("return ")
+		self:serialize(f,self)
+		f:write("\n")
+		f:flush()
+		f:close()
+	end
 end
 function settings:load()
 	local ok,f = pcall(loadfile(self:filename()))
@@ -103,6 +140,7 @@ function settings:load()
 		end
 	end
 end
+settings:reset()
 settings:load()
 
 -- Make color an object to ease code
@@ -346,10 +384,22 @@ function bayer.norm(matrix)
 end
 	
 function Color:extra_op(x,y)
-	if settings.ordered>0 then
+	if settings.dither_lvl ~= 0 then
 		if not bayer.matrix then
-			local m = {{1}} -- aic and {{1}} or {{9,5,6},{4,1,2},{8,3,7}}
-			for i=1,settings.ordered do m = bayer.double(m) end
+			local m = settings.dither_mat[settings.dither_lvl]
+			if not m then
+				m = settings.dither_lvl>0 and {{1}} or --{{1,2,3},{7,8,9},{4,5,6},{10,11,12}}
+				-- {{3,7,4},{6,1,9},{2,8,5}} -- 10miles ko
+				-- {{1,2,4},{3,5,7},{6,8,9}} -- Image14 ko
+				-- {{4,1,2},{6,3,5}}
+				-- {{7,9,5},{2,1,4},{6,3,8}} --
+				-- {{1,2,3},{4,5,6}} --
+				{{9,5,6},{4,1,2},{8,3,7}}
+				-- {{1,2,5},{4,3,6},{7,8,9}}
+				-- {{1,2,5},{3,4,7},{6,8,9}}
+				-- {{1,2},{3,4}}
+				for i=1,math.abs(settings.dither_lvl) do m = bayer.double(m) end
+			end
 			bayer.matrix = bayer.norm(m)
 			bayer.w = #bayer.matrix[1]
 			bayer.h = #bayer.matrix
@@ -478,58 +528,78 @@ if type(arg)=='table' and type(arg[1])=='string' then
     function setpicturesize(w,h) 
         -- io.stderr:write(string.rep(' ',79) .. '\r') 
         -- io.stderr:write('\n')
-        io.stderr:flush() 
+        -- io.stderr:flush() 
     end
     function putpicturepixel(x,y,c) end
     function setcolor(i,r,g,b) end
 	function updatescreen() end
+	function finalizepicture() end
 else
 	local moved, key, mx, my, mb = waitinput(0.2)
-	local keycode = "s"
 	-- error((moved and "1" or "0").." ".. (key % 128).." ".. mx.." ".. my.." ".. mb.." ".. key)
 	
-	if (key%128) == keycode:byte(1) then -- '=' pressed
-		local ok, do_aic, aic1, aic2, sort
-		if settings.aic or settings.aic_ then
-			local p1p2,p2p1
-			for _,p in ipairs(settings.aic or settings.aic_) do
-				aic1 = (aic1==p[1] and aic1) or (aic1 and 0) or p[1]
-				aic2 = (aic2==p[2] and aic2) or (aic2 and 0) or p[2]
-				p1p2 = p1p2 or (p[1]<p[2] and 1)
-				p2p1 = p2p1 or (p[2]<p[1] and 1)
+	if string.char(key%128):lower() == "x" then -- Settings pressed
+		local loop, changed = true,false
+		
+		local function set(x, y)
+			if settings[x] ~= y then
+				settings[x] = y
+				changed = true
 			end
-			sort = (p1p2 or 0) - (p2p1 or 0)
 		end
 		
-		ok, do_aic, settings.ordered, aic1, aic2, sort, settings.err_att = inputbox(
-			'Settings for PictOric',
-			'AIC Mode',settings.aic and 1 or 0,0,1,0,
-			'Ordered Dither    (0=off)',settings.ordered,0,5,0,
-			'Odd lines color  (0=auto)',aic1 or 0,0,6,0,
-			'Even lines color (0=auto)',aic2 or 0,0,6,0,
-			'Odd <= Even  (0=no order)',sort or 0,-1,1,0,
-			'Error damping', settings.err_att, 0,1,3)
-		if ok then
-			if do_aic>0 then
-				settings.aic_ = nil
-				settings.aic  = {}
-				local c1 = aic1>0 and {aic1} or {1,2,3,4,5,6}
-				local c2 = aic2>0 and {aic2} or {1,2,3,4,5,6}
-				for _,a in ipairs(c1) do
-					for _,b in ipairs(c2) do
-						if aic1+aic2>0 or 0<=(b-a)*sort then 
-							table.insert(settings.aic, {a,b})
-						end
+		if type(settings.aic)=="table" then settings.aic=1 end
+		
+		local dither_min,dither_max = -4,5
+		for i,m in pairs(settings.dither_mat) do
+			dither_min = math.min(dither_min, i)
+			dither_max = math.max(dither_max, i)
+		end
+		
+		while loop do
+			local ok, r1, r2, r3, r4, r5, r6, r7 = inputbox(
+				'Settings for PictOric',
+				'AIC Mode                 ', settings.aic        or 0,0,1,0,
+				' Odd lines color (0=auto)', settings.aic_c1     or 0,0,7,0,
+				' Even lines color(0=auto)', settings.aic_c2     or 0,0,7,0,
+				' Sort odd/even    (0=off)', settings.aic_co     or 0,-1,1,0,
+				'Ordered Dither    (0=off)', settings.dither_lvl or 0,dither_min,dither_max,0,
+				'Error damping factor     ', settings.err_att    or 0.998,0,1,3,
+				'Extra Settings           ', 0,0,1,0)
+			if ok then
+				set("aic",        r1)
+				set("aic_c1",     r2)
+				set("aic_c2",     r3)
+				set("aic_co",     r4)
+				set("dither_lvl", r5)
+				set("err_att",    r6)
+				if r7>0 then 
+					ok, r1, r2, r3, r4, r5, r6, r7 = inputbox(
+						'Advanced Settings for PictOric',
+						'Save BMP                ', settings.save_bmp     or 1,0,1,0,
+						'Basic Loader            ', settings.basic_loader or 1,0,1,0,
+						'Horizontal Center       ', settings.center_x     or 1,0,1,0,
+						'Vertical Center         ', settings.center_y     or 1,0,1,0,
+						'Left Margin    (-1=auto)', settings.blank_margin or -1,-1,1,0,
+						'Distance Algorithm      ', settings.dist2_alg    or 1,1,4,0,
+						'Reset all to defaults   ', 0,0,1,0)
+					if ok then
+						set("save_bmp",     r1)
+						set("basic_loader", r2)
+						set("center_x",     r3)
+						set("center_y",		r4)
+						set("blank_margin", r5)
+						set("dist2_alg",    r6)
+						if r7>0 then settings:reset(); changed = true end
 					end
+				else
+					loop = false
 				end
 			else
-				settings.aic_ = settings.aic
-				settings.aic  = nil
+				return
 			end
-			settings:save()
-		else
-			return
 		end
+		if changed then settings:save() end
 	end
 end
 
@@ -570,6 +640,7 @@ end
     
 -- squared distance between two colors
 local function dist2(c1,c2)
+	local dist2_alg = settings.dist2_alg
     -- Approximate delta-E (http://www.compuphase.com/cmetric.htm#GAMMA)
     -- this gives better result than euclid since this better account for
     -- human perception of color differences.
@@ -1223,12 +1294,15 @@ end
 
 -- current-line error / next-line error
 local err1,err2 = mkErr(width),mkErr(width)
+local bitmask = {}
+for i=0,width-1 do bitmask[i] = 2^(5-(i%6)) end
 
 function dither(callback, min_thr, aic)
+	err1:clear()
+	min_thr = min_thr or 1e300
 	local tot = 0
 	local res = {}
 	local buf = ''
-	err1:clear()
 	for i=1,width*height do res[i]=0 end
 	for y=0,height-1 do
 		-- info(string.format("%2d%%", math.floor(100*y/height)))  
@@ -1254,7 +1328,7 @@ function dither(callback, min_thr, aic)
 					c = cmd.fg
 					tot = tot + d1
 					if (cmd.cmd % 128)>=64 then
-						cmd.cmd = cmd.cmd + 2^(5-(x%6))
+						cmd.cmd = cmd.cmd + bitmask[x]
 					end
 				else
 					c = cmd.bg
@@ -1273,11 +1347,11 @@ function dither(callback, min_thr, aic)
 				-- total error
 				tot = tot + d
 			end
-			
+			-- if tot>min_thr then break end
 			-- store chosen color for later display on screen or
 			-- in BMP file
 			res[y*width + x + 1] = c
-			e:sub(pal[c]):extra_op(x,y)
+			e:sub(pal[c])
 			-- Ostromoukhov's diffusion
 			ostro:diffuse(p, e, err1[x+xs], err2[x-xs], err2[x])
 		end
@@ -1290,7 +1364,7 @@ function dither(callback, min_thr, aic)
 			for i=0,w39 do lbuf[i+1] =line[i].cmd end
 			buf = buf .. string.char(unpack(lbuf))
 		end
-		if min_thr and tot>min_thr then break end
+		if tot>min_thr or running==0 then break end
 	end
 	
 	return tot,res,buf
@@ -1298,11 +1372,58 @@ end
 
 -- convert full picture
 local start = os.clock()
-local extra,tot,res,buf=''
-if settings.aic then
+local extra,tot,res,buf='',0,{},''
+if type(settings.aic)=="table" or settings.aic>0 then
+	local couples = {}
+	if type(settings.aic)=='table' then
+		couples = settings.aic
+	else
+		for a=1,7 do if settings.aic_c1==0 or settings.aic_c1==a then
+			for b=1,7 do if settings.aic_c2==0 or settings.aic_c2==b then
+				if settings.aic_c1+settings.aic_c2>0 or
+				   (a-b)*settings.aic_co>=0 then table.insert(couples, {a,b}) end 
+			end end
+		end end
+	end
+	local function lum(r,g,b) return 0.299*r + 0.587*g +0.114*b end
+	local intens = {lum(1,0,0),lum(0,1,0),lum(1,1,0),lum(0,0,1),lum(1,0,1),lum(0,1,1),lum(1,1,1)}
+	table.sort(couples, function(a,b) 
+		return intens[a[1]]+intens[a[2]]>intens[b[1]]+intens[b[2]] 
+	end)
+	-- local s=''
+	-- for _,p in ipairs(couples) do
+		-- s = s.. ' ('.. p[1]..','..p[2]..')'
+	-- end
+	-- error(s)
+	
+	-- function err(pic) 
+		-- local p,t = 1,0
+		-- for y=0,height-1,2 do
+			-- for x=0,width-1,2 do
+				-- local a,b
+				-- a = getLinearPixel(x,y)
+				-- a:add(getLinearPixel(x+1,y))
+				-- a:add(getLinearPixel(x,y+1))
+				-- a:add(getLinearPixel(x+1,y+1)):mul(.25)
+				
+				-- b = Color:new(pal[pic[p]])
+				-- b:add(pal[pic[p+1]])
+				-- b:add(pal[pic[p+width]])
+				-- b:add(pal[pic[p+width+1]]):mul(.25)
+				
+				-- t = t + dist2(a,b)
+				-- p = p + 2
+			-- end
+			-- p = p + width
+		-- end
+		-- return t
+	-- end
+	
 	tot = 1E300
-	for n,pair in ipairs(settings.aic) do
-		local t,r,b = dither(function(x) return string.format("%2d%% (AIC Mode)", math.floor(100*(x + (n-1))/#settings.aic)) end, tot, pair)
+	for n,pair in ipairs(couples) do
+		local t,r,b = dither(function(x) return string.format("%2d%% (Testing AIC=%d,%d)", math.floor(100*(x + (n-1))/#couples), pair[1],pair[2]) end, tot, pair)
+		-- print(pair[1],pair[2], t)
+		-- t = err(r)
 		if t<tot then 
 			tot,res,buf = t,r,b 
 			extra = ' AIC=' .. pair[1] .. ',' .. pair[2]
@@ -1322,6 +1443,7 @@ if res then
 		putpicturepixel((i-1)%width,math.floor((i-1)/width),v)
 	end
 	updatescreen()
+	finalizepicture()
 end
 
 -- done! display some info

@@ -57,7 +57,7 @@ PictOric saves its configuration paramters in the LUA file `$HOME/.pictoric.lua`
 
 ### Adding other dithering patterns
 
-You can add other dithering patterns to the tool by adding a entries like `[n] = { {a11,a12,...}, {a21, a22, ...}, ... }` representing a [threshold map](https://en.wikipedia.org/wiki/Ordered_dithering)  (integers starting from 1, like in Image Magick's [threshold.xml](http://www.imagemagick.org/source/thresholds.xml) file) in the `dither_mat = {}` entry of the returned structure. That matrix will be used if you enter `n` as the dither-level in the UI (`n` can be any non zero integer). For instance if you have
+You can add other dithering patterns to the tool by adding a entries like `[n] = { {a11,a12,...}, {a21, a22, ...}, ... }` representing a [threshold map](https://en.wikipedia.org/wiki/Ordered_dithering)  (integers starting from 1, like in Image Magick's [threshold.xml](https://github.com/ManiAm/HVACmanagement/blob/master/ImageMagick-6.8.2-10/thresholds.xml) file) in the `dither_mat = {}` entry of the returned structure. That matrix will be used if you enter `n` as the dither-level in the UI (`n` can be any non zero integer). For instance if you have
 ```
 	...
     dither_map = {

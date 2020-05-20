@@ -3,11 +3,11 @@ Image conversion tool for the [Oric](https://en.wikipedia.org/wiki/Oric) machine
 
 ## Features
 * Powerful image conversion algorithm adapted to [Oric's gfx constraints](http://osdk.org/index.php?page=articles&ref=ART9).
- * [Victor Ostromoukhov](http://www-perso.iro.umontreal.ca/~ostrom/varcoeffED/SIGGRAPH01_varcoeffED.pdf)'s variable error-diffusion coefficients algorithm.
- * Ordered dithering algorithm.
-   By default bayer matrix and a specific 3x3 clustered oric matrices are provided, but you can add as many as you want in the configuration file. **New v1.3**
- * AIC images can be generated **New v1.3**
-   You can choose the color pair by yourself or let the tool choose for you.
+	* [Victor Ostromoukhov](http://www-perso.iro.umontreal.ca/~ostrom/varcoeffED/SIGGRAPH01_varcoeffED.pdf)'s variable error-diffusion coefficients algorithm.
+	* Ordered dithering algorithm.
+	  By default bayer matrix and a specific 3x3 clustered oric matrices are provided, but you can add as many as you want in the configuration file. **New v1.3**
+	* AIC images can be generated **New v1.3**
+	  You can choose the color pair by yourself or let the tool choose for you.
 * Works as GrafX2 external script.
   This allows having access to the Settings UI **New v1.3**
 * Works in command-line:

@@ -28,12 +28,7 @@ local settings =  {reset=function(_)
 	_.err_att      = .9980  -- attenuation of error diffusion (1 = no chg)
 	_.dist2_alg    = 1      -- distance algorithm 1..4
 	_.dither_lvl   = 0      -- bayer dither order level 
-	_.dither_mat   = {
-	[6] = {{9,1,3},
-	       {5,7,11},
-		   {10,2,4},
-		   {6,8,12}}
-	}     -- extra dithering matrix
+	_.dither_mat   = {}     -- extra dithering matrix
 end}
 -------------------------------------------------------------------------------
 

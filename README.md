@@ -6,7 +6,7 @@ Image conversion tool for the [Oric](https://en.wikipedia.org/wiki/Oric) machine
 	* [Victor Ostromoukhov](http://www-perso.iro.umontreal.ca/~ostrom/varcoeffED/SIGGRAPH01_varcoeffED.pdf)'s variable error-diffusion coefficients algorithm.
 	* Special Ordered dithering algorithm. **New v1.3**\
 	  By default Bayer's matrix (2x2, 4x4, 8x8, 16x16, 32x32) and clustered matrices (3x3, 6x6, 12x12, 24x24, 48x48) are provided. But you can add new ones in the configuration file. 
-* AIC images can be generated **New v1.3**\
+* AIC images can be generated. **New v1.3**\
   You can choose the color pair by yourself or let the tool choose for you.
 * Works as GrafX2 external script.
 	* Easy access to most configuration parameters is possible via the UI. **New v1.3**
@@ -38,21 +38,44 @@ If you intend to use it in command-line, add the appropriate exes (`convert` and
   <img src="http://forum.defence-force.org/download/file.php?id=1775&t=1">
   
   Conversion takes typically around 20secs on modern machines (by 2020 standards ;) ).
+  
+  If you press the "x" key while pushing the "Run" button a Window will pop up allowing you to enable the **AIC Mode** or the **Ordered dithering mode** as well as changing various configuration parameters (see below.) These parameters will be reused the next time you run the tool (even on the command line). If you want to tweek other parameters, just select the "Extra settings" entry and press "Ok". Another window will appear with even more parameters to change. In case you want to revert to the default settings, check the "Reset all to defaults" entry and press Ok. If you don't want you changes to be applied, just press the "Cancel" button, otherwise the "Ok" button applies and saves the settings to disk. 
 
 * __from the command line__, just run:
   
   ```<lua-interperter> <path-to>PictOric.lua <filename>.<ext>```
-  
-  or if you are running on some linux variant where both `lua` and `PictOric.lua`are on the `$PATH`
-  
-  ```PictOric.lua <filename>.<ext>```
   
   where:
   * `<lua-intepreter>` is the lua interpreter you want to use (LuaJIT.exe for instance under windows)
   * `<filename>.<ext>` is the full path to the picture you want to convert.
   
   Conversion time is much smaller when using LuaJIT than when using the builtin interpreter of GrafX2.
+
+## Parameters
+
+PictOric saves its configuration paramters in the LUA file `$HOME/.pictoric.lua` for Unix-like machines and under `%USERPROFILE%\.pictoric.lua` for windows-like machines. If it is missinbg or contains syntax-errors, il will be ignored and a default one will be used by the tool.
+
+### Adding other dithering patterns
+
+You can add other dithering patterns to the tool by adding a entries like `[n] = { {a11,a12,...}, {a21, a22, ...}, ... }` representing a [threshold map](https://en.wikipedia.org/wiki/Ordered_dithering)  (integers starting from 1, like in Image Magick's [threshold.xml](http://www.imagemagick.org/source/thresholds.xml) file) in the `dither_mat = {}` entry of the returned structure. That matrix will be used if you enter `n` as the dither-level in the UI (`n` can be any non zero integer). For instance if you have
+```
+	...
+    dither_map = {
+		[1] = {{1,1},
+		       {2,2}}
+	},
+	...
+```
+Then selecting "1" as dither-level will use horizontal-lines patterns for dithering instead of the classical 2x2 Bayer matrix.
 	
+### Suggested values
+
+By default, PictOric uses a 0.998 error damping factor. The closest it is to one, the more the error will propagate to the surrounding pixels allowing it to be corrected. This works well for the default error-diffusion algorithm because it has lots of degrees of freedom to correct the errors. However, if you plan to used Ordered dithering or even simple AIC images, there is much less possibility to correct an error in its local neighbourhood. So it is propagated rather far away in the pictures leaving some ugly artifacts if you keep that parameter close to the unit. Therefore it is suggessted that you use a value of 0.707 (sqrt(2)) when you inted to make AIC or Ordered-dithering pictures.
+
+If you use 0 as aic color #1 or color #2, the tool will find the best color pair it can to reduce the global error in AIC mode. However this is slow and I'm often quite unhappy with the chosend picture. So for the moment I **strongly** encourage you to use the 3,6 as color pair. This pair offers a wide variety of colors and produces very good looking pictures most of the time.
+
+A good Bayer's ordered dithering matrix is the 8x8 one which is select with level=3. But for AIT the 6x6 matrix (level=-2) usually provide nice result (see sample below.)
+
 ## Discussion
 The discussion about this algorithm takes place on the [Defence-Force forum](http://forum.defence-force.org/viewtopic.php?p=20025#p20025)
 

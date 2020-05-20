@@ -72,7 +72,7 @@ Then selecting "1" as dither-level will use horizontal-lines patterns for dither
 
 By default, PictOric uses a 0.998 error damping factor. The closest it is to one, the more the error will propagate to the surrounding pixels, allowing it to be fixed by the algorithm. This works well for the default error-diffusion algorithm because it has lots of degrees of freedom to change the surrounding pixel colors and fix it. However, if you plan to use ordered dithering or even simply produce AIC images, then there is much less possibilitird to locally correct an error. It is then propagated rather far away in the image leaving ugly artifacts. Therefore it is suggessted that you reduce the value of the damping facor. A value of 0.707 (sqrt(2)) usually works well you intend to make AIC or Ordered-dithering pictures.
 
-If you use 0 as aic color #1 or color #2, the tool will find the best color pair it can to reduce the global error in AIC mode. However this is slow and I'm often quite unhappy with the chosend picture. So for the moment I **strongly** encourage you to use the 3,6 as color pair. This pair offers a wide variety of colors and produces very good looking pictures most of the time.
+If you use 0 as AIC color #1 or color #2, the tool will find the best color pair it can. However this is quite slow process and *at the moment* one is often quite unhappy with the chosen pair. So for the time being it is **strongly** recommended to use the 3,6 as color pair for a first try. That pair offers a wide variety of colors and produces very good looking pictures most of the time.
 
 A good Bayer's ordered dithering matrix is the 8x8 one which is select with level=3. But for AIT the 6x6 matrix (level=-2) usually provide nice result (see sample below.)
 

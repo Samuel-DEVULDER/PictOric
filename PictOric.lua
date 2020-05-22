@@ -332,76 +332,8 @@ function Color.dE2000(col1,col2)
                  (dHp / (kH*sH))^2 +
                  (dCp / (kC*sC))*(dHp / (kH*sH))*rT )
 end
-
--- bayer dithering support
-local bayer = {}
-function bayer.double(matrix)
-	local m,n=#matrix,#matrix[1]
-	local r = {}
-	for j=1,m*2 do
-		local t = {}
-		for i=1,n*2 do t[i]=0; end
-		r[j] = t;
-	end
 	
-	-- 0 3
-	-- 2 1
-	for j=1,m do
-		for i=1,n do
-			local v = 4*matrix[j][i]
-			r[m*0+j][n*0+i] = v-3
-			r[m*1+j][n*1+i] = v-2
-			r[m*1+j][n*0+i] = v-1
-			r[m*0+j][n*1+i] = v-0
-		end
-	end
-	
-	return r;
-end
--- returns a version of the matrix settings.normalized into  
--- the 0-1 range
-function bayer.norm(matrix)
-	local m,n=#matrix,#matrix[1]
-	local max,ret = 0,{}
-	for j=1,m do
-		for i=1,n do
-			max = math.max(max,matrix[j][i])
-		end
-	end
-	max=max+1
-	for j=1,m do
-		ret[j] = {}
-		for i=1,n do
-			ret[j][i]=matrix[j][i]/max
-		end
-	end
-	return ret
-end
-	
-function Color:extra_op(x,y)
-	if settings.dither_lvl ~= 0 then
-		if not bayer.matrix then
-			local m = settings.dither_mat[settings.dither_lvl]
-			if not m then
-				m = settings.dither_lvl>0 and {{1}} or --{{1,2,3},{7,8,9},{4,5,6},{10,11,12}}
-				-- {{3,7,4},{6,1,9},{2,8,5}} -- 10miles ko
-				-- {{1,2,4},{3,5,7},{6,8,9}} -- Image14 ko
-				-- {{4,1,2},{6,3,5}}
-				-- {{7,9,5},{2,1,4},{6,3,8}} --
-				-- {{1,2,3},{4,5,6}} --
-				{{9,5,6},{4,1,2},{8,3,7}}
-				-- {{1,2,5},{4,3,6},{7,8,9}}
-				-- {{1,2,5},{3,4,7},{6,8,9}}
-				-- {{1,2},{3,4}}
-				for i=1,math.abs(settings.dither_lvl) do m = bayer.double(m) end
-			end
-			bayer.matrix = bayer.norm(m)
-			bayer.w = #bayer.matrix[1]
-			bayer.h = #bayer.matrix
-		end
-		local d = bayer.matrix[1+(y % bayer.h)][1+(x % bayer.w)]
-		self:map(function(x) return math.floor(x+d) end)
-	end
+function Color:ordered_dither(x,y)
 	return self
 end
 
@@ -545,7 +477,7 @@ else
 		
 		if type(settings.aic)=="table" then settings.aic=1 end
 		
-		local dither_min,dither_max = -4,5
+		local dither_min,dither_max = -5,5
 		for i,m in pairs(settings.dither_mat) do
 			dither_min = math.min(dither_min, i)
 			dither_max = math.max(dither_max, i)
@@ -557,7 +489,7 @@ else
 				'AIC Mode                 ', settings.aic        or 0,0,1,0,
 				' Odd lines color (0=auto)', settings.aic_c1     or 0,0,7,0,
 				' Even lines color(0=auto)', settings.aic_c2     or 0,0,7,0,
-				' Sort odd/even    (0=off)', settings.aic_co     or 0,-1,1,0,
+				' Sort odd/even    (0=off)', settings.aic_co     or 0,-2,2,0,
 				'Ordered Dither    (0=off)', settings.dither_lvl or 0,dither_min,dither_max,0,
 				'Error damping factor     ', settings.err_att    or 0.998,0,1,3,
 				'Extra Settings           ', 0,0,1,0)
@@ -1126,6 +1058,102 @@ function mkPal()
 end
 local pal = mkPal()
 
+-- enable ordered-dither mode
+if settings.dither_lvl ~= 0 then
+	local function bayer(matrix)
+		local m,n=#matrix,#matrix[1]
+		local r = {}
+		for j=1,m*2 do
+			local t = {}
+			for i=1,n*2 do t[i]=0 end
+			r[j] = t;
+		end
+		
+		-- 0 3
+		-- 2 1
+		for j=1,m do
+			for i=1,n do
+				local v = 4*matrix[j][i]
+				r[m*0+j][n*0+i] = v-3
+				r[m*1+j][n*1+i] = v-2
+				r[m*1+j][n*0+i] = v-1
+				r[m*0+j][n*1+i] = v-0
+			end
+		end
+		
+		return r;
+	end
+	-- returns a version of the matrix settings.normalized into  
+	-- the 0-1 range
+	local function norm(matrix)
+		local m,n=#matrix,#matrix[1]
+		local max,ret = 0,{}
+		for j=1,m do
+			for i=1,n do
+				max = math.max(max,matrix[j][i])
+			end
+		end
+		max=max+1
+		for j=1,m do
+			ret[j] = {}
+			for i=1,n do
+				ret[j][i]=matrix[j][i]/max
+			end
+		end
+		return ret
+	end
+
+	local m = settings.dither_mat[settings.dither_lvl]
+	if not m then
+		m = settings.dither_lvl>0 and bayer{{1}} or --{{1,2,3},{7,8,9},{4,5,6},{10,11,12}}
+		-- {{3,7,4},{6,1,9},{2,8,5}} -- 10miles ko
+		-- {{7,3,6},{4,9,1},{8,2,5}}
+		-- {{9,8,6},{7,5,3},{4,2,1}} -- beurk
+		-- {{1,2,4},{3,5,7},{6,8,9}} -- Image14 ko
+		-- {{4,1,2},{6,3,5}}
+		-- {{7,9,5},{2,1,4},{6,3,8}} --
+		-- {{1,2,3},{4,5,6}} --
+		{{9,5,6},{4,1,2},{8,3,7}} -- best IMHO
+		-- {{9,8,7},{6,5,4},{3,2,1}}
+		-- {{9,8,6},{7,5,3},{4,2,1}}
+		-- {{6,5,3},{4,2,1}}
+		-- {{9,8,5},{6,7,3},{4,2,1}}
+		-- {{1,5,4},{6,9,8},{2,7,3}} -- bien
+		-- {{3,1,5},{8,9,6},{4,7,2}}
+		
+		-- {{1,2,5},{4,3,6},{8,7,9}}
+		-- {{1,2,4},{3,5,6}}
+		-- {{1,3},{2,5},{4,6}}
+		-- {{1,2,5},{4,3,6},{7,8,9}}
+		-- {{1,2,5},{3,4,7},{6,8,9}}
+		-- {{1,2},{3,4}}
+		
+		for i=2,math.abs(settings.dither_lvl) do m = bayer(m) end
+	end
+	m = norm(m)
+	m.h = #m
+	m.w = #m[1]
+	-- reindex to 0 for speed reasons
+	local function shft(t) for i=0,#t do t[i]=t[i+1] end end
+	for i=1,#m do shft(m[i]) end shft(m)
+	function Color:ordered_dither(x,y)
+		local d = m[y % m.h][x % m.w]
+		-- return Color:new(self):map(function(x) return x+d-.5 end)
+		return self:map(function(x) return 
+			-- x+d<1 and 0 or 1 
+			math.floor(x+d) -- wrong but produces better pictures
+		end)
+		
+		-- return self:map(function(x) return math.floor(x+d) end)
+			-- x+d<1 and 0 or 1 end)
+			-- (math.floor(x<0 and 0 or x+d)+x)/2 end)
+			-- math.min(1,math.max(0,x+d-.5)) end)
+			-- x+d<1 and x*.5 or (1+x)*.5 end)
+			-- math.floor(x+d)==1 and 1 or 0 end)
+			-- math.max(math.min(x+d-.5,1),0) end)
+	end
+end
+
 -- Error beteen desired image and produced images.
 function mkErr(w)
     local e = {} -- this is just an array of colors
@@ -1174,17 +1202,16 @@ function mkLine(y,err1)
                     local e = Color:new()
                     for x=self.i*6,self.i*6+5 do
                         local p = getLinearPixel(x,line.y)
-                        e:add(line.err1[x]):add(p):extra_op(x,y)
-                        local c = fg
+                        e:add(line.err1[x]):add(p):ordered_dither(x,y)
+                        local c = bg
                         local d = dist2(e, c)
-                        if bg~=fg then
-                            local t = dist2(e, bg)
-                            if t<d then c,d = bg,t end
+                        if bg~=fg and d>0 then
+                            local t = dist2(e, fg)
+                            if t<d then c,d = fg,t end
                         end
                         t = t + d
-                        e:sub(c)
                         -- diffuse error to next pixel using Ostromoukhov's coefs
-                        ostro:diffuse(p,e) 
+                        ostro:diffuse(p, e:sub(c)) 
                     end
                     self.cache[k] = t -- (bg,fg)
                     self.cache[l] = t -- (fg,bg) is the same
@@ -1270,17 +1297,17 @@ function optim(y, err1, aic)
 		end
         for x=0,w39 do
             -- for each octet get best attribvute-cmd
-            local i,_,c = false, srch(line,x,ink,pap)
+            local inv,_,c = false, srch(line,x,ink,pap)
             line[x].cmd = c -- store the attribute
             -- and update bg/fg accordingly
-            if c>=128 then c,i = c-128,true end
+            if c>=128 then c,inv = c-128,true end
             if c==64 then
-                line[x].fg = i and 7-ink or ink
-                line[x].bg = i and 7-pap or pap
+                line[x].fg = inv and 7-ink or ink
+                line[x].bg = inv and 7-pap or pap
             else
                 if c<8 then ink = c else pap = c-16 end
-                line[x].fg = i and 7-pap or pap
-                line[x].bg = i and 7-pap or pap
+                line[x].fg = inv and 7-pap or pap
+                line[x].bg = inv and 7-pap or pap
             end
         end
     end
@@ -1309,8 +1336,7 @@ function dither(callback, min_thr, aic)
 		if y%2==1 then x0,x1,xs = x1,x0,-xs end
 		for x=x0,x1,xs do
 			local p = getLinearPixel(x,y)
-			local e = err1[x]
-			e:add(p):extra_op(x,y)
+			local e = err1[x]:add(p):ordered_dither(x,y)
 			local c
 			if line then
 				-- oric constaints
@@ -1340,15 +1366,15 @@ function dither(callback, min_thr, aic)
 					if t<d then c,d = i,t end
 				end
 				-- total error
-				tot = tot + d
+				-- tot = tot + d
 			end
-			-- if tot>min_thr then break end
+			-- tot = tot + dist2(p,pal[c])
+			if tot>min_thr then break end
 			-- store chosen color for later display on screen or
 			-- in BMP file
 			res[y*width + x + 1] = c
-			e:sub(pal[c])
 			-- Ostromoukhov's diffusion
-			ostro:diffuse(p, e, err1[x+xs], err2[x-xs], err2[x])
+			ostro:diffuse(p, e:sub(pal[c]), err1[x+xs], err2[x-xs], err2[x])
 		end
 		-- prepare error for next line
 		err1,err2 = err2,err1
@@ -1373,12 +1399,21 @@ if type(settings.aic)=="table" or settings.aic>0 then
 	if type(settings.aic)=='table' then
 		couples = settings.aic
 	else
-		for a=1,7 do if settings.aic_c1==0 or settings.aic_c1==a then
-			for b=1,7 do if settings.aic_c2==0 or settings.aic_c2==b then
-				if settings.aic_c1+settings.aic_c2>0 or
-				   (a-b)*settings.aic_co>=0 then table.insert(couples, {a,b}) end 
-			end end
-		end end
+		local function accept(a,b)
+			if settings.aic_c1+settings.aic_c2>0 then
+				return (settings.aic_c1==0 or settings.aic_c1==a)
+				and    (settings.aic_c2==0 or settings.aic_c2==b)
+			else 
+				if a==b or a+b==7 then return false end
+				local x,y = (a-b)*settings.aic_co, math.abs(settings.aic_co)
+				return y>=2 and x>0 or y<2 and x>=0
+			end
+		end
+		for a=1,6 do 
+			for b=1,6 do
+				if accept(a,b) then table.insert(couples, {a,b}) end 
+			end
+		end
 	end
 	local function lum(r,g,b) return 0.299*r + 0.587*g +0.114*b end
 	local intens = {lum(1,0,0),lum(0,1,0),lum(1,1,0),lum(0,0,1),lum(1,0,1),lum(0,1,1),lum(1,1,1)}
@@ -1417,11 +1452,13 @@ if type(settings.aic)=="table" or settings.aic>0 then
 	tot = 1E300
 	for n,pair in ipairs(couples) do
 		local t,r,b = dither(function(x) return string.format("%2d%% (Testing AIC=%d,%d)", math.floor(100*(x + (n-1))/#couples), pair[1],pair[2]) end, tot, pair)
-		-- print(pair[1],pair[2], t)
+		-- if pair[1]==pair[2] then t=t+1 end
+		print(n, pair[1], pair[2], t, t<tot and "**" or "")
 		-- t = err(r)
 		if t<tot then 
 			tot,res,buf = t,r,b 
 			extra = ' AIC=' .. pair[1] .. ',' .. pair[2]
+			if tot==0 then running=0 end
 		end
 		if running==0 then break end
 	end

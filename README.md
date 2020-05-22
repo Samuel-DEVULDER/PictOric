@@ -70,11 +70,15 @@ Then selecting "1" as dither-level will use horizontal-lines patterns for dither
 	
 ### Suggested values
 
-By default, PictOric uses a 0.998 error damping factor. The closest it is to one, the more the error will propagate to the surrounding pixels, allowing it to be fixed by the algorithm. This works well for the default error-diffusion algorithm because it has lots of degrees of freedom to change the surrounding pixel colors and fix it. However, if you plan to use ordered dithering or even simply produce AIC images, then there is much less possibilitird to locally correct an error. It is then propagated rather far away in the image leaving ugly artifacts. Therefore it is suggessted that you reduce the value of the damping facor. A value of 0.707 (sqrt(2)) usually works well you intend to make AIC or Ordered-dithering pictures.
+By default, PictOric uses a 0.998 error damping factor. The closest it is to one, the more the error will propagate to the surrounding pixels, allowing it to be fixed by the algorithm. This works well for the default error-diffusion algorithm because it has lots of degrees of freedom to change the surrounding pixel colors and fix it. However, if you plan to use ordered dithering or even simply produce AIC images, then there is much less possibilitied to correct an error local. It is then propagated rather far away in the image leaving ugly artifacts. Therefore it is suggessted that you reduce the value of the damping facor. A value of 0.707 (sqrt(2)) usually works well you intend to make AIC or Ordered-dithering pictures.
 
-If you use 0 as AIC color #1 or color #2, the tool will find the best color pair it can. However this is quite slow process and *at the moment* one is often quite unhappy with the chosen pair. So for the time being it is **strongly** recommended to use the 3,6 as color pair for a first try. That pair offers a wide variety of colors and produces very good looking pictures most of the time.
+If you use 0 as AIC color #1 or color #2, the tool will find the best color pair it can. Although the selected image is the one with the least mathematical error, the result might not be as colorful as expected. A solution for this is to restring the search to a single couple of color. Color 3 for even lines and 6 for odd lines usually give the best result are very fast to process.
 
-A good Bayer's ordered dithering matrix is the 8x8 one which is select with level=3. But for AIT the 6x6 matrix (level=-2) usually provide nice result (see sample below.)
+A good Bayer's ordered dithering matrix is the 8x8 one which is select with level=3. But for AIC the 6x6 matrix (level=-2) usually provide nice result (see sample below.)
+
+### Speeding up the search for AIC
+
+If you specify 0 for both AIC color #1 and color #2 (lets call them c1 and c2) the tool will generate all (c1,c2) pairs with c1 and c2 ranging from 1 to 7. This makes 49 images to compare. This is quite slow. You can speedup things a little by instructing the tool to only consider cases where c1<=c2 or c2>=c1. This is doe by setting a positive or negative value to the entry "Sort odd/even" under the AIC settings (or aic_co in the settings file). You can even be more strict by ussing the value +/-2 which requires that c1 and c2 be different in addition.
 
 ## Discussion
 The discussion about this algorithm takes place on the [Defence-Force forum](http://forum.defence-force.org/viewtopic.php?p=20025#p20025)

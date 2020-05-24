@@ -1,1 +1,0 @@
-aic=1, dither_lvl=-3, err_att=0.000/umwxrkbh...time=9.39s AIC=6,3

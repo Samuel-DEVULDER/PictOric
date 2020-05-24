@@ -1,1 +1,0 @@
-aic=0, dither_lvl=2, err_att=0.000/umwxrkbh...time=7.56s err=133

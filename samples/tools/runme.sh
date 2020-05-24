@@ -30,8 +30,9 @@ do
 		echo done
 	fi
 done
+sleep 10
 
-for att in 0.000 0.707 0.998
+for att in 0.998 0.707 0.500
 do
 	for aic in 0 1 
 	do		
@@ -64,10 +65,10 @@ EOF
 				convert .pictoric.tap.bmp "$dir/${n%.*}.png"
 				cp .pictoric.tap "$dir/${n%.*}.tap"
 			done
-			# sleep 10
+			sleep 10
 		done
 	done
-done 
+done
 
 rm .pictoric.* || true
 
@@ -81,7 +82,7 @@ do
 done
 
 cat >result.md <<EOF
-# Here is a comparison of various settings and pictures
+# Here is a comparison of various settings on various pictures
 $HEADER
 $HLINE
 EOF

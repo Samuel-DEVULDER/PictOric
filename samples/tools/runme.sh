@@ -77,7 +77,7 @@ rm .pictoric.* || true
 fi
 
 LEN=""
-for i in {1..55}; do LEN="$LEN&nbsp;"; done
+for i in {1..56}; do LEN="$LEN&nbsp;"; done
 
 HLINE="--|--"
 HEADER="$LEN<br>source image<br>$LEN | $LEN<br>\`libpipi\`<br>$LEN"

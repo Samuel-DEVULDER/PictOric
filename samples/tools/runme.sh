@@ -7,6 +7,8 @@ cd "`dirname $0`"/..
 export HOME=$PWD
 export USERPROFILE=`cygpath -s -w "$HOME"`
 
+if false; then
+
 dir=libpipi
 if [ ! -d $dir ]; then mkdir $dir; else rm $dir/* || true; fi
 for n in *.*
@@ -72,9 +74,10 @@ done
 
 rm .pictoric.* || true
 
+fi
 
 LEN=""
-for i in {1..54}; do LEN="$LEN&nbsp;"; done
+for i in {1..55}; do LEN="$LEN&nbsp;"; done
 
 HLINE="--|--"
 HEADER="$LEN<br>source image<br>$LEN | $LEN<br>\`libpipi\`<br>$LEN"

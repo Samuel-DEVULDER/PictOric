@@ -72,13 +72,16 @@ done
 
 rm .pictoric.* || true
 
+
+LEN=""
+for i in {1..54}; do LEN="$LEN&nbsp;"; done
+
 HLINE="--|--"
-HEADER="<div style=\"width:240px\">source image</div>"
-HEADER="$HEADER | <div style=\"width:240px\">\`libpipi\`</div>"	
+HEADER="$LEN<br>source image<br>$LEN | $LEN<br>\`libpipi\`<br>$LEN"
 for i in *=* 
 do 
 	HLINE="$HLINE|--"
-	HEADER="$HEADER | <div style=\"width:240px\">\`PictOric\`<br><br>${i// /<br>}</div>"
+	HEADER="$HEADER | \`PictOric\`<br>$LEN<br>${i// /<br>}</div>"
 done
 
 cat >result.md <<EOF

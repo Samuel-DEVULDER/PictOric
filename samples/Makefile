@@ -7,7 +7,7 @@ INPUTS=$(wildcard inputs/*.png)
 PIPI=tools/pipi.exe
 
 all:
-	@MAKE=$(MAKE) sh runme.sh
+	@MAKE=$(MAKE) sh tools/runme.sh
 	
 git:
 	git commit -a -m "samples updated on `date`"

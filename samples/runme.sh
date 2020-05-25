@@ -7,7 +7,7 @@ cd "`dirname $0`"
 
 ERRATT="0.998 0.500 0.000"
 DITHER="0 -3 2 1"
-RESULT=result.md
+RESULT=README.md
 
 # -----------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ done
 
 # -----------------------------------------------------------------------------
 # convert picture to png & proper size
-for n in *.*
+for n in inputs/*.*
 do
 	case "$n" in
 	*.md|*.png|*.sh) ;;
@@ -42,11 +42,11 @@ done
 
 # -----------------------------------------------------------------------------
 # generate libpipi versions
-dir=libpipi
-if test ! -d $dir; then mkdir $dir; fi
+dir=outputs/libpipi
+if test ! -d $dir; then mkdir -p $dir; fi
 TARGET=""; for n in *.png; do TARGET="$TARGET $dir/$n"; done
 echo >>$dir/log.txt "*** Update started on `date`"
-$MAKE $TARGET | tee -a $dir/log.txt
+$MAKE libpipi | tee -a $dir/log.txt
 echo >>$dir/log.txt "*** Update ended on `date`"
 
 # -----------------------------------------------------------------------------
@@ -59,8 +59,8 @@ for dither in $DITHER
 do
 for att in $ERRATT
 do
-	dir="a${aic}d${dither}e${att}"
-	if test ! -d "$dir"; then mkdir "$dir"; fi
+	dir="outputs/a${aic}d${dither}e${att}"
+	if test ! -d "$dir"; then mkdir -p "$dir"; fi
 	
 	echo >>$PAIR "$dir" "aic=$aic, dither_lvl=$dither, err_att=$att"		
 	cat >$dir/.pictoric.lua <<EOF
@@ -73,11 +73,9 @@ return {
 	save_bmp = 1
 }
 EOF
-	TARGET=""
-	for n in *.png; do TARGET="$TARGET $dir/$n"; done
-
+	
 	echo >>$dir/log.txt "*** Update started on `date`"
-	$MAKE $TARGET "DIR=$dir"  | tee -a $dir/log.txt
+	$MAKE $dir | tee -a $dir/log.txt
 	echo >>$dir/log.txt "*** Update ended on `date`"
 done
 done
@@ -107,15 +105,15 @@ do
 done
 echo >>$RESULT
 
-for n in *.png
+for n in inputs/*.png
 do
+	n=`basename $n`
 	# echo -n ${n%.*}...
-	echo >>$RESULT -n "<a href="./$n"><img width=240 height=200	src=\"./$n\" title=\"$n\"></a>"
-	prev="libpipi/$n"
-	echo >>$RESULT -n "| <a href=\"./libpipi/${n%.*}.tap\"><img id=\"$prev\" width=240 height=200 src=\"./$prev\"></a>"
+	echo >>$RESULT -n "<a href="./$n"><img width=240 height=200	src=\"./inputs/$n\" title=\"$n\"></a>"
+	echo >>$RESULT -n "| <a href=\"./outputs/libpipi/${n%.*}.tap\"><img width=240 height=200 src=\"./outputs/libpipi/$n\"></a>"
 	cat $PAIR | while read d t
 	do
-		echo >>$RESULT -n "| <a href=\"./$d/${n%.*}.tap\"><img id=\"$d/$n\" width=240 height=200 src=\"./$d/$n\" title=\"$t\" onmousover=\"$prev.src='./libpipi/$n';\" onmouseout=\"$prev.src='./$d/$n';\"></a>"
+		echo >>$RESULT -n "| <a href=\"./$d/${n%.*}.tap\"><img id=\"$d/$n\" width=240 height=200 src=\"./$d/$n\" title=\"$t\"></a>"
 		prev="$d/$n"
 	done
 	echo >>$RESULT

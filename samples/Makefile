@@ -7,7 +7,13 @@ LIBPIPI=libpipi
 
 all:
 	@MAKE=$(MAKE) sh runme.sh
-	
+
+git:
+	git commit -u -m "samples updated on `date`"
+
+github: git
+	git push
+
 clean:
 	@echo -n "Cleaning..."
 	@rm -r $(LIBPIPI) 2>/dev/null || true

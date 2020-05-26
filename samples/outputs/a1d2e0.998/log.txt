@@ -154,3 +154,59 @@ make[2]: « outputs/a1d2e0.998/10000000000002800000021065239955.png » est à 
 make[2]: « outputs/a1d2e0.998/@mire.png » est à jour.
 make[2]: « outputs/a1d2e0.998/the-jones.png » est à jour.
 *** Update ended on Tue, May 26, 2020  9:41:14 AM for a1d2e0.998
+*** Update started on Tue, May 26, 2020 12:15:49 PM for a1d2e0.998
+outputs/a1d2e0.998/screenshot_scr_001.png...time=7.6s AIC=3,6
+outputs/a1d2e0.998/14198.png...time=8.8s AIC=3,1
+outputs/a1d2e0.998/screenshot_smu_001.png...time=9.32s AIC=2,6
+outputs/a1d2e0.998/lana_lang_pretty_face_wallpaper_-_800x600.png...time=9.62s AIC=3,6
+outputs/a1d2e0.998/14mq23t.png...time=10.77s AIC=6,3
+outputs/a1d2e0.998/8F7A3.png...time=11.17s AIC=3,1
+outputs/a1d2e0.998/21052678_20131024170236592.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png...time=6.91s AIC=3,2
+outputs/a1d2e0.998/seashell.png...time=9.32s AIC=6,3
+outputs/a1d2e0.998/21052699_20131024170429573.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png...time=12.42s AIC=6,3
+outputs/a1d2e0.998/2583.png...time=10.94s AIC=3,6
+outputs/a1d2e0.998/1142919-mandrill.png...time=11.74s AIC=3,6
+outputs/a1d2e0.998/Beautiful-Long-Eye-Lashes.png...time=10.99s AIC=3,1
+outputs/a1d2e0.998/1674697515_e151ace98f_m.png...time=6.57s AIC=3,6
+outputs/a1d2e0.998/122.png...time=9.39s AIC=3,6
+outputs/a1d2e0.998/33ttg8l.png...time=10.41s AIC=6,4
+outputs/a1d2e0.998/archer-girl-25615-400x250.png...time=8.83s AIC=3,6
+outputs/a1d2e0.998/wordless-wednesday-beautiful-butterfly-L-1Yj1Ut.png...time=10.11s AIC=6,4
+outputs/a1d2e0.998/@0rainbow.png...time=12.78s AIC=4,2
+outputs/a1d2e0.998/buffy.png...time=9.93s AIC=1,3
+outputs/a1d2e0.998/Image05.png...time=10.32s AIC=6,2
+outputs/a1d2e0.998/Pretty_face-me.png...time=10.03s AIC=6,3
+outputs/a1d2e0.998/Tiger-Wallpaper-tigers-9981604-800-600.png...time=9.2s AIC=3,6
+outputs/a1d2e0.998/jp2.png...time=12.17s AIC=6,3
+outputs/a1d2e0.998/Ribbon.png...time=11.19s AIC=6,3
+outputs/a1d2e0.998/the-jones.png...time=9.07s AIC=3,6
+outputs/a1d2e0.998/scene1.png...time=9s AIC=3,6
+outputs/a1d2e0.998/Beautiful_Birds_Wallpapers_HD.png...time=10.07s AIC=3,1
+outputs/a1d2e0.998/blue-marble-west.png...time=11.26s AIC=6,4
+outputs/a1d2e0.998/vincent-vangogh-route-avec-cypres-et-ciel-etoile.png...time=10.14s AIC=6,3
+outputs/a1d2e0.998/homer.png...time=8.35s AIC=6,3
+outputs/a1d2e0.998/umwxrkbh.png...time=8.68s AIC=3,6
+outputs/a1d2e0.998/8ed216af535ac31c4b57ddd8770b93cf6568048a698efb990e2123b9db4d6681.png...time=11s AIC=3,6
+outputs/a1d2e0.998/images.png...time=8.96s AIC=1,2
+outputs/a1d2e0.998/rihanna.png...time=10.09s AIC=3,5
+outputs/a1d2e0.998/purple-rose-pretty-beautiful.png...time=8.83s AIC=5,3
+outputs/a1d2e0.998/@0hgray.png...time=9.67s AIC=6,3
+outputs/a1d2e0.998/screenshot_sonc_001.png...time=11.66s AIC=3,6
+outputs/a1d2e0.998/tintin-wallpaper-2.png...time=9.61s AIC=3,1
+outputs/a1d2e0.998/687474703a2f2f666f72756d2e646566656e63652d666f7263652e6f72672f646f776e6c6f61642f66696c652e7068703f69643d3136363326743d31.png...time=8.14s AIC=3,1
+outputs/a1d2e0.998/forest_dragon.png...time=11.49s AIC=3,6
+outputs/a1d2e0.998/jp1.png...time=9.47s AIC=3,6
+outputs/a1d2e0.998/a_place_to_be.png...time=9.21s AIC=3,1
+outputs/a1d2e0.998/floating_on_air.png...time=9.92s AIC=3,1
+outputs/a1d2e0.998/0a1905za.png...time=12.28s AIC=5,3
+outputs/a1d2e0.998/21548.png...time=10.05s AIC=1,4
+outputs/a1d2e0.998/heroic-fantasy-2-9a76b9e6-img.png...time=10.12s AIC=3,6
+outputs/a1d2e0.998/dog.png...time=11.27s AIC=6,4
+outputs/a1d2e0.998/431877__magician_p.png...time=11.82s AIC=2,4
+outputs/a1d2e0.998/10000000000002800000021065239955.png...time=9.21s AIC=3,1
+outputs/a1d2e0.998/21052680_20131024170237233.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png...time=11.19s AIC=6,3
+outputs/a1d2e0.998/smokelogo.png...time=11.24s AIC=6,3
+outputs/a1d2e0.998/lena.png...time=12.13s AIC=6,4
+outputs/a1d2e0.998/@mire.png...time=11.31s AIC=6,3
+outputs/a1d2e0.998/jbju.png...time=7.17s AIC=3,6
+*** Update ended on Tue, May 26, 2020 12:17:27 PM for a1d2e0.998

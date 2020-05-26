@@ -30,7 +30,7 @@ do
 	*.md|*.png|*.sh) ;;
 	*) 	if test -f "$n"
 		then
-			convert "$n" -resize 240x200 -gravity center -background black -extent 240x200 "${n%.*}.png" 2>/dev/null || true
+			convert "$n" -resize 240x200 -gravity center -background black -extent 240x200 "${n%.*}.png" 2>/dev/null && rm "$n" || true
 		fi;;
 	esac
 done

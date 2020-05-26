@@ -414,3 +414,59 @@ make[2]: « outputs/a0d-3e0.500/10000000000002800000021065239955.png » est à
 make[2]: « outputs/a0d-3e0.500/@mire.png » est à jour.
 make[2]: « outputs/a0d-3e0.500/the-jones.png » est à jour.
 *** Update ended on Tue, May 26, 2020  9:41:07 AM for a0d-3e0.500
+*** Update started on Tue, May 26, 2020 11:47:48 AM for a0d-3e0.500
+outputs/a0d-3e0.500/screenshot_scr_001.png...time=12.18s err=166
+outputs/a0d-3e0.500/8F7A3.png...time=12.03s err=179
+outputs/a0d-3e0.500/14198.png...time=12.12s err=118
+outputs/a0d-3e0.500/14mq23t.png...time=12.64s err=186
+outputs/a0d-3e0.500/lana_lang_pretty_face_wallpaper_-_800x600.png...time=13.25s err=161
+outputs/a0d-3e0.500/screenshot_smu_001.png...time=13.61s err=155
+outputs/a0d-3e0.500/seashell.png...time=11.7s err=122
+outputs/a0d-3e0.500/21052699_20131024170429573.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png...time=12.81s err=124
+outputs/a0d-3e0.500/2583.png...time=12.6s err=115
+outputs/a0d-3e0.500/Beautiful-Long-Eye-Lashes.png...time=12.53s err=149
+outputs/a0d-3e0.500/1142919-mandrill.png...time=13.64s err=157
+outputs/a0d-3e0.500/21052678_20131024170236592.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png...time=13.16s err=156
+outputs/a0d-3e0.500/33ttg8l.png...time=12.35s err=148
+outputs/a0d-3e0.500/122.png...time=12.68s err=104
+outputs/a0d-3e0.500/archer-girl-25615-400x250.png...time=11.88s err=87
+outputs/a0d-3e0.500/wordless-wednesday-beautiful-butterfly-L-1Yj1Ut.png...time=13.12s err=156
+outputs/a0d-3e0.500/1674697515_e151ace98f_m.png...time=14s err=141
+outputs/a0d-3e0.500/@0rainbow.png...time=14.08s err=129
+outputs/a0d-3e0.500/Image05.png...time=11.55s err=145
+outputs/a0d-3e0.500/Pretty_face-me.png...time=12.3s err=160
+outputs/a0d-3e0.500/jp2.png...time=13.17s err=183
+outputs/a0d-3e0.500/buffy.png...time=14.48s err=177
+outputs/a0d-3e0.500/Tiger-Wallpaper-tigers-9981604-800-600.png...time=13.4s err=162
+outputs/a0d-3e0.500/Ribbon.png...time=12.6s err=0
+outputs/a0d-3e0.500/the-jones.png...time=12.51s err=136
+outputs/a0d-3e0.500/scene1.png...time=11.46s err=135
+outputs/a0d-3e0.500/blue-marble-west.png...time=11.26s err=119
+outputs/a0d-3e0.500/Beautiful_Birds_Wallpapers_HD.png...time=12.61s err=179
+outputs/a0d-3e0.500/vincent-vangogh-route-avec-cypres-et-ciel-etoile.png...time=12.37s err=158
+outputs/a0d-3e0.500/homer.png...time=12.2s err=181
+outputs/a0d-3e0.500/umwxrkbh.png...time=11.85s err=165
+outputs/a0d-3e0.500/images.png...time=10.15s err=53
+outputs/a0d-3e0.500/8ed216af535ac31c4b57ddd8770b93cf6568048a698efb990e2123b9db4d6681.png...time=11.26s err=116
+outputs/a0d-3e0.500/rihanna.png...time=10.98s err=123
+outputs/a0d-3e0.500/screenshot_sonc_001.png...time=11.88s err=132
+outputs/a0d-3e0.500/purple-rose-pretty-beautiful.png...time=12.68s err=154
+outputs/a0d-3e0.500/@0hgray.png...time=9.62s err=0
+outputs/a0d-3e0.500/tintin-wallpaper-2.png...time=11.83s err=188
+outputs/a0d-3e0.500/forest_dragon.png...time=11.81s err=128
+outputs/a0d-3e0.500/687474703a2f2f666f72756d2e646566656e63652d666f7263652e6f72672f646f776e6c6f61642f66696c652e7068703f69643d3136363326743d31.png...time=11.53s err=131
+outputs/a0d-3e0.500/jp1.png...time=11.63s err=171
+outputs/a0d-3e0.500/a_place_to_be.png...time=11.5s err=132
+outputs/a0d-3e0.500/0a1905za.png...time=11.78s err=141
+outputs/a0d-3e0.500/21548.png...time=11.1s err=124
+outputs/a0d-3e0.500/floating_on_air.png...time=12.01s err=115
+outputs/a0d-3e0.500/dog.png...time=12.66s err=135
+outputs/a0d-3e0.500/431877__magician_p.png...time=11.56s err=167
+outputs/a0d-3e0.500/heroic-fantasy-2-9a76b9e6-img.png...time=12.36s err=176
+outputs/a0d-3e0.500/lena.png...time=12.09s err=169
+outputs/a0d-3e0.500/21052680_20131024170237233.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png...time=11.77s err=150
+outputs/a0d-3e0.500/smokelogo.png...time=10.94s err=137
+outputs/a0d-3e0.500/10000000000002800000021065239955.png...time=10.12s err=130
+outputs/a0d-3e0.500/jbju.png...time=8.79s err=166
+outputs/a0d-3e0.500/@mire.png...time=9.7s err=55
+*** Update ended on Tue, May 26, 2020 11:49:46 AM for a0d-3e0.500

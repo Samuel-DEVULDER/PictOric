@@ -210,3 +210,59 @@ outputs/a1d2e0.998/lena.png...time=12.13s AIC=6,4
 outputs/a1d2e0.998/@mire.png...time=11.31s AIC=6,3
 outputs/a1d2e0.998/jbju.png...time=7.17s AIC=3,6
 *** Update ended on Tue, May 26, 2020 12:17:27 PM for a1d2e0.998
+*** Update started on Tue, May 26, 2020 12:46:13 PM for a1d2e0.998
+make[2]: « outputs/a1d2e0.998/screenshot_smu_001.png » est à jour.
+make[2]: « outputs/a1d2e0.998/lana_lang_pretty_face_wallpaper_-_800x600.png » est à jour.
+make[2]: « outputs/a1d2e0.998/14mq23t.png » est à jour.
+make[2]: « outputs/a1d2e0.998/screenshot_scr_001.png » est à jour.
+make[2]: « outputs/a1d2e0.998/8F7A3.png » est à jour.
+make[2]: « outputs/a1d2e0.998/14198.png » est à jour.
+make[2]: « outputs/a1d2e0.998/21052699_20131024170429573.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png » est à jour.
+make[2]: « outputs/a1d2e0.998/seashell.png » est à jour.
+make[2]: « outputs/a1d2e0.998/1142919-mandrill.png » est à jour.
+make[2]: « outputs/a1d2e0.998/2583.png » est à jour.
+make[2]: « outputs/a1d2e0.998/Beautiful-Long-Eye-Lashes.png » est à jour.
+make[2]: « outputs/a1d2e0.998/21052678_20131024170236592.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png » est à jour.
+make[2]: « outputs/a1d2e0.998/33ttg8l.png » est à jour.
+make[2]: « outputs/a1d2e0.998/122.png » est à jour.
+make[2]: « outputs/a1d2e0.998/wordless-wednesday-beautiful-butterfly-L-1Yj1Ut.png » est à jour.
+make[2]: « outputs/a1d2e0.998/archer-girl-25615-400x250.png » est à jour.
+make[2]: « outputs/a1d2e0.998/1674697515_e151ace98f_m.png » est à jour.
+make[2]: « outputs/a1d2e0.998/@0rainbow.png » est à jour.
+make[2]: « outputs/a1d2e0.998/Image05.png » est à jour.
+make[2]: « outputs/a1d2e0.998/buffy.png » est à jour.
+make[2]: « outputs/a1d2e0.998/Pretty_face-me.png » est à jour.
+make[2]: « outputs/a1d2e0.998/jp2.png » est à jour.
+make[2]: « outputs/a1d2e0.998/Tiger-Wallpaper-tigers-9981604-800-600.png » est à jour.
+make[2]: « outputs/a1d2e0.998/Ribbon.png » est à jour.
+make[2]: « outputs/a1d2e0.998/the-jones.png » est à jour.
+make[2]: « outputs/a1d2e0.998/scene1.png » est à jour.
+make[2]: « outputs/a1d2e0.998/blue-marble-west.png » est à jour.
+make[2]: « outputs/a1d2e0.998/Beautiful_Birds_Wallpapers_HD.png » est à jour.
+make[2]: « outputs/a1d2e0.998/vincent-vangogh-route-avec-cypres-et-ciel-etoile.png » est à jour.
+make[2]: « outputs/a1d2e0.998/homer.png » est à jour.
+make[2]: « outputs/a1d2e0.998/umwxrkbh.png » est à jour.
+make[2]: « outputs/a1d2e0.998/8ed216af535ac31c4b57ddd8770b93cf6568048a698efb990e2123b9db4d6681.png » est à jour.
+make[2]: « outputs/a1d2e0.998/images.png » est à jour.
+make[2]: « outputs/a1d2e0.998/rihanna.png » est à jour.
+make[2]: « outputs/a1d2e0.998/purple-rose-pretty-beautiful.png » est à jour.
+make[2]: « outputs/a1d2e0.998/screenshot_sonc_001.png » est à jour.
+make[2]: « outputs/a1d2e0.998/@0hgray.png » est à jour.
+make[2]: « outputs/a1d2e0.998/tintin-wallpaper-2.png » est à jour.
+make[2]: « outputs/a1d2e0.998/forest_dragon.png » est à jour.
+make[2]: « outputs/a1d2e0.998/687474703a2f2f666f72756d2e646566656e63652d666f7263652e6f72672f646f776e6c6f61642f66696c652e7068703f69643d3136363326743d31.png » est à jour.
+make[2]: « outputs/a1d2e0.998/jp1.png » est à jour.
+make[2]: « outputs/a1d2e0.998/a_place_to_be.png » est à jour.
+make[2]: « outputs/a1d2e0.998/0a1905za.png » est à jour.
+make[2]: « outputs/a1d2e0.998/floating_on_air.png » est à jour.
+make[2]: « outputs/a1d2e0.998/21548.png » est à jour.
+make[2]: « outputs/a1d2e0.998/dog.png » est à jour.
+make[2]: « outputs/a1d2e0.998/heroic-fantasy-2-9a76b9e6-img.png » est à jour.
+make[2]: « outputs/a1d2e0.998/431877__magician_p.png » est à jour.
+make[2]: « outputs/a1d2e0.998/lena.png » est à jour.
+make[2]: « outputs/a1d2e0.998/21052680_20131024170237233.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png » est à jour.
+make[2]: « outputs/a1d2e0.998/smokelogo.png » est à jour.
+make[2]: « outputs/a1d2e0.998/10000000000002800000021065239955.png » est à jour.
+make[2]: « outputs/a1d2e0.998/@mire.png » est à jour.
+outputs/a1d2e0.998/jbju.png...time=9.24s AIC=3,6
+*** Update ended on Tue, May 26, 2020 12:46:23 PM for a1d2e0.998

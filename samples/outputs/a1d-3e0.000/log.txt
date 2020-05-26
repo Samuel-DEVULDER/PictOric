@@ -210,3 +210,59 @@ outputs/a1d-3e0.000/smokelogo.png...time=11.17s AIC=6,3
 outputs/a1d-3e0.000/@mire.png...time=9.98s AIC=3,6
 outputs/a1d-3e0.000/jbju.png...time=7.95s AIC=3,6
 *** Update ended on Tue, May 26, 2020 12:15:49 PM for a1d-3e0.000
+*** Update started on Tue, May 26, 2020 12:46:01 PM for a1d-3e0.000
+make[2]: « outputs/a1d-3e0.000/screenshot_smu_001.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/lana_lang_pretty_face_wallpaper_-_800x600.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/14mq23t.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/screenshot_scr_001.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/8F7A3.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/14198.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/21052699_20131024170429573.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/seashell.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/1142919-mandrill.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/2583.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/Beautiful-Long-Eye-Lashes.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/21052678_20131024170236592.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/33ttg8l.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/122.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/wordless-wednesday-beautiful-butterfly-L-1Yj1Ut.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/archer-girl-25615-400x250.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/1674697515_e151ace98f_m.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/@0rainbow.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/Image05.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/buffy.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/Pretty_face-me.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/jp2.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/Tiger-Wallpaper-tigers-9981604-800-600.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/Ribbon.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/the-jones.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/scene1.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/blue-marble-west.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/Beautiful_Birds_Wallpapers_HD.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/vincent-vangogh-route-avec-cypres-et-ciel-etoile.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/homer.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/umwxrkbh.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/8ed216af535ac31c4b57ddd8770b93cf6568048a698efb990e2123b9db4d6681.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/images.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/rihanna.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/purple-rose-pretty-beautiful.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/screenshot_sonc_001.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/@0hgray.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/tintin-wallpaper-2.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/forest_dragon.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/687474703a2f2f666f72756d2e646566656e63652d666f7263652e6f72672f646f776e6c6f61642f66696c652e7068703f69643d3136363326743d31.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/jp1.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/a_place_to_be.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/0a1905za.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/floating_on_air.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/21548.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/dog.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/heroic-fantasy-2-9a76b9e6-img.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/431877__magician_p.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/lena.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/21052680_20131024170237233.jpg-r_640_600-b_1_D6D6D6-f_jpg-q_x-xxyxx.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/smokelogo.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/10000000000002800000021065239955.png » est à jour.
+make[2]: « outputs/a1d-3e0.000/@mire.png » est à jour.
+outputs/a1d-3e0.000/jbju.png...time=10.01s AIC=3,6
+*** Update ended on Tue, May 26, 2020 12:46:12 PM for a1d-3e0.000

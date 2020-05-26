@@ -12,19 +12,14 @@ RESULT=README.md
 # -----------------------------------------------------------------------------
 
 export LC_TIME=en_US.UTF-8
-NUMBER_OF_PROCESSORS=${NUMBER_OF_PROCESSORS:-1}
-if test $NUMBER_OF_PROCESSORS -eq 1; then NUMBER_OF_PROCESSORS=2; fi
-MAKE=${MAKE:-make -j`expr $NUMBER_OF_PROCESSORS - 1`}
-MAKE="$MAKE --no-print-directory"
+MAKE=${MAKE:-make}
+MAKE="$MAKE --no-print-directory --output-sync" # -j$NUMBER_OF_PROCESSORS
 
 # -----------------------------------------------------------------------------
 # remove space in file names
-for n in *" "*
+for n in inputs/*" "*
 do
-	if test -f "$n" 
-	then
-		mv "$n" "${n// /_}"
-	fi
+	if test -f "$n"; then mv "$n" "${n// /_}"; fi
 done
 
 # -----------------------------------------------------------------------------
@@ -44,10 +39,7 @@ done
 # generate libpipi versions
 dir=outputs/libpipi
 if test ! -d $dir; then mkdir -p $dir; fi
-TARGET=""; for n in *.png; do TARGET="$TARGET $dir/$n"; done
-echo >>$dir/log.txt "*** Update started on `date`"
 $MAKE libpipi | tee -a $dir/log.txt
-echo >>$dir/log.txt "*** Update ended on `date`"
 
 # -----------------------------------------------------------------------------
 # generate PictOric versions
@@ -74,9 +66,7 @@ return {
 }
 EOF
 	
-	echo >>$dir/log.txt "*** Update started on `date`"
-	$MAKE $dir | tee -a $dir/log.txt
-	echo >>$dir/log.txt "*** Update ended on `date`"
+	$MAKE $dir.dir | tee -a $dir/log.txt
 done
 done
 done

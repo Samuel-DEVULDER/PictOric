@@ -1105,7 +1105,7 @@ if settings.dither_lvl ~= 0 then
 
 	local m = settings.dither_mat[settings.dither_lvl]
 	if not m then
-		m = settings.dither_lvl>0 and {{4,3},{2,1}} or --{{1,2,3},{7,8,9},{4,5,6},{10,11,12}}
+		m = settings.dither_lvl>0 and bayer{{1}} or -- {{4,3},{2,1}} or --{{1,2,3},{7,8,9},{4,5,6},{10,11,12}}
 		-- {{3,7,4},{6,1,9},{2,8,5}} -- 10miles ko
 		-- {{7,3,6},{4,9,1},{8,2,5}}
 		-- {{9,8,6},{7,5,3},{4,2,1}} -- beurk

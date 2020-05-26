@@ -1,10 +1,12 @@
+PIPI=tools/pipi.exe
 LUA=../tools/winb32/luajit.exe
 PICTORIC=../PictOric.lua
 CONVERT=convert
 
 INPUTS=$(wildcard inputs/*.png)
+OUTPUTS=outputs
 
-PIPI=tools/pipi.exe
+.PHONY: outputs/a0d0e0.998 $(wildcard OUTPUTS/*)
 
 all:
 	@MAKE=$(MAKE) sh tools/runme.sh
@@ -16,20 +18,23 @@ github: git
 	git push
 
 clean:
-	@echo -n "Cleaning..."
-	@rm -r outputs README.md 2>/dev/null || true
-	@echo done
+	-rm -r $(OUTPUTS) README.md
 	
-libpipi: $(INPUTS:inputs/%=outputs/libpipi/%)
+libpipi: 
+	@echo "*** Update started on `date` for $@"
+	@$(MAKE) $(INPUTS:inputs/%=$(OUTPUTS)/libpipi/%)
+	@echo "*** Update ended on `date` for $@"
 
-outputs/%: 
-	make DIR=$* $(INPUTS:inputs/%=$*/%)
+$(OUTPUTS)/%.dir:
+	@echo "*** Update started on `date` for $*"
+	@$(MAKE) DIR=$(OUTPUTS)/$* $(INPUTS:inputs/%=$(OUTPUTS)/$*/%)
+	@echo "*** Update ended on `date` for $*"
 
-output/libpipi/%.png: inputs/%.png ../PictOric.lua
+$(OUTPUTS)/libpipi/%.png: inputs/%.png ../PictOric.lua
 	@echo -n "$@..."
-	@$(CONVERT) "$<" "output/libpipi/$*.bmp"
-	@$(PIPI) "output/libpipi/$*.bmp" -o "output/libpipi/$*.tap" "output/libpipi/$*.tap" -o "$@"
-	@rm "output/libpipi/$*.bmp"
+	@$(CONVERT) "$<" "$(OUTPUTS)/libpipi/$*.bmp"
+	@$(PIPI) "$(OUTPUTS)/libpipi/$*.bmp" -o "$(OUTPUTS)/libpipi/$*.tap" "$(OUTPUTS)/libpipi/$*.tap" -o "$@"
+	@rm "$(OUTPUTS)/libpipi/$*.bmp"
 	@echo "done"
 	
 $(DIR)/%.png: inputs/%.png ../PictOric.lua
@@ -37,4 +42,4 @@ $(DIR)/%.png: inputs/%.png ../PictOric.lua
 	@$(CONVERT) "$<" "$(DIR)/$*.bmp"
 	@HOME="$(DIR)" USERPROFILE="$(DIR)" $(LUA) $(PICTORIC) "$(DIR)/$*.bmp" 2>&1 1>/dev/null | \
 		sed -e  's%.*:\s*\(.*\)[\r\n].*%\1%;s%\s*$$%%g'
-	@$(CONVERT) "$(DIR)/$*.tap.bmp" "$@" && rm "$(DIR)/$*.tap.bmp"
+	@$(CONVERT) "$(DIR)/$*.tap.bmp" "$@" && rm "$(DIR)/$*.tap.bmp" "$(DIR)/$*.bmp"

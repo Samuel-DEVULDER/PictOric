@@ -153,6 +153,10 @@ Color.black = Color:new()
 function Color:tostring()
     return "(r=" .. self.r .. " g=" .. self.g .. " b=" .. self.b .. ")"
 end
+function Color:clr()
+	self.r,self.g,self.b = 0,0,0
+	return self
+end
 function Color:map(func, c)
     self._lab = nil
     self.r = func(self.r, c and c.r)
@@ -332,7 +336,12 @@ function Color.dE2000(col1,col2)
                  (dHp / (kH*sH))^2 +
                  (dCp / (kC*sC))*(dHp / (kH*sH))*rT )
 end
-	
+function Color.euclid2(c1,c2)
+	 return (c1.r - c2.r)^2 + (c1.g - c2.g)^2 + (c1.b - c2.b)^2 
+end
+function Color:lum()
+	return 0.299*self.r + 0.587*self.g +0.114*self.b 
+end
 function Color:ordered_dither(x,y)
 	return self
 end
@@ -413,7 +422,7 @@ local function read_bmp24(file)
         bytesPerRow = 4*math.floor((biWidth*biBitCount/8 + 3)/4),
         offset = bfOffBits,
         norm = norm and norm>0 and norm_max/norm,
-        getLinearPixel = function(self,x,y)
+        getLinearPictureColor = function(self,x,y)
             if x<0 or y<0 or x>=self.width or y>=self.height then
                 return Color.black
             else
@@ -443,7 +452,7 @@ if type(arg)=='table' and type(arg[1])=='string' then
     -- emulate GrafX2 function for cmdline
     function getfilename()  return name,dir end
     function getpicturesize() return bmp.width,bmp.height end
-    function getLinearPictureColor(x,y) return bmp:getLinearPixel(x,y) end
+    function getLinearPictureColor(x,y) return bmp:getLinearPictureColor(x,y) end
     function waitbreak() return 0 end
     function statusmessage(msg) 
         local txt = name .. ': ' .. msg
@@ -532,7 +541,7 @@ end
 
 -- return the Color @(x,y) on the original screen in linear space
 local screen_w, screen_h, _getLinearPictureColor = getpicturesize()
-if not getLinearPictureColor then
+if not getLinearPictureColor then -- running in GrafX2
     function getLinearPictureColor(x,y) 
         if _getLinearPictureColor==nil then
             _getLinearPictureColor = {}
@@ -599,7 +608,7 @@ local function dist2(c1,c2)
     end
     
     -- Plain euclid (default)
-    return (c1.r - c2.r)^2 + (c1.g - c2.g)^2 + (c1.b - c2.b)^2 
+    return Color.euclid2(c1,c2)
 end
 
 -- prints info
@@ -656,7 +665,7 @@ local function getLinearPixel(x,y)
             end
         end
         p:div((y2-y1)*(x2-x1))
-		if math.max(p.r,p.g,p.b)<4/(255*12.92) then p:mul(0) end
+		if math.max(p.r,p.g,p.b)<4/(255*12.92) then p:clr() end
         if _getLinearPixel then 
             _getLinearPixel[k]=p 
         end
@@ -1053,6 +1062,9 @@ function mkPal()
         for i=0,7 do
             setcolor(i, math.floor(self[i].r*255), math.floor(self[i].g*255), math.floor(self[i].b*255))
         end
+		for i=8,255 do
+			setcolor(i,0,0,0)
+		end
     end
     return t
 end
@@ -1105,7 +1117,8 @@ if settings.dither_lvl ~= 0 then
 
 	local m = settings.dither_mat[settings.dither_lvl]
 	if not m then
-		m = settings.dither_lvl>0 and bayer{{1}} or -- {{4,3},{2,1}} or --{{1,2,3},{7,8,9},{4,5,6},{10,11,12}}
+		m = settings.dither_lvl>0 -- and bayer{{1}} or -- 
+		and {{4,3},{2,1}} or --{{1,2,3},{7,8,9},{4,5,6},{10,11,12}}
 		-- {{3,7,4},{6,1,9},{2,8,5}} -- 10miles ko
 		-- {{7,3,6},{4,9,1},{8,2,5}}
 		-- {{9,8,6},{7,5,3},{4,2,1}} -- beurk
@@ -1119,6 +1132,7 @@ if settings.dither_lvl ~= 0 then
 		-- {{6,5,3},{4,2,1}}
 		-- {{9,8,5},{6,7,3},{4,2,1}}
 		-- {{1,5,4},{6,9,8},{2,7,3}} -- bien
+		-- {{2,5,1},{6,9,8},{3,7,4}}
 		-- {{3,1,5},{8,9,6},{4,7,2}}
 		
 		-- {{1,2,5},{4,3,6},{8,7,9}}
@@ -1159,7 +1173,7 @@ function mkErr(w)
     local e = {} -- this is just an array of colors
     for i=-1,w do e[i] = Color:new(0,0,0) end
     e.clear = function(self)  -- null the error
-        for i=-1,w do self[i]:mul(0) end
+        for i=-1,w do self[i]:clr() end
     end
     return e
 end
@@ -1319,7 +1333,7 @@ local err1,err2 = mkErr(width),mkErr(width)
 local bitmask = {}
 for i=0,width-1 do bitmask[i] = 2^(5-(i%6)) end
 
-function dither(callback, min_thr, aic)
+local function dither_free(callback, min_thr, aic)
 	err1:clear()
 	min_thr = min_thr or 1e300
 	local tot = 0
@@ -1327,48 +1341,25 @@ function dither(callback, min_thr, aic)
 	local buf = ''
 	for i=1,width*height do res[i]=0 end
 	for y=0,height-1 do
-		-- info(string.format("%2d%%", math.floor(100*y/height)))  
 		if callback then info(callback(y/height)) end
 		-- find best line
-		local line = oric>0 and optim(y,err1, aic)
 		local x0,x1,xs = 0,width-1,1
 		-- use serpentine
 		if y%2==1 then x0,x1,xs = x1,x0,-xs end
 		for x=x0,x1,xs do
 			local p = getLinearPixel(x,y)
 			local e = err1[x]:add(p):ordered_dither(x,y)
-			local c
-			if line then
-				-- oric constaints
-				local cmd = line[math.floor(x/6)]
-				-- notice that at this point we can dither without decoding
-				-- cmd because bg/fg already contains the two available colors
-				-- for the current pixel.
-				local d1,d2 = dist2(e,pal[cmd.fg]),dist2(e,pal[cmd.bg])
-				if d1<=d2 then
-					c = cmd.fg
-					tot = tot + d1
-					if (cmd.cmd % 128)>=64 then
-						cmd.cmd = cmd.cmd + bitmask[x]
-					end
-				else
-					c = cmd.bg
-					tot = tot + d2
-				end
-			else
+			local c = 0
 				-- no constaints. This allows comparing result
 				-- between theoric (pun intended) error, and the error
 				-- obtained by this algorithm.
-				c=0
-				local d=dist2(e,pal[c])
-				for i=1,7 do
-					local t=dist2(e,pal[i])
-					if t<d then c,d = i,t end
-				end
-				-- total error
-				-- tot = tot + d
+			local d=dist2(e,pal[c])
+			for i=1,7 do
+				local t=dist2(e,pal[i])
+				if t<d then c,d = i,t end
 			end
-			-- tot = tot + dist2(p,pal[c])
+			tot = tot + d
+			-- tot = tot + (p:ordered_dither(x,y):lum() - pal[c]:lum())^2
 			if tot>min_thr then break end
 			-- store chosen color for later display on screen or
 			-- in BMP file
@@ -1389,7 +1380,122 @@ function dither(callback, min_thr, aic)
 	end
 	
 	return tot,res,buf
+end
+
+local function blurryImg()
+	local o = {{},{},{}}
+	local a = 2/3
+	local b = (1-a)/2
+	o.aa = a*a
+	o.ab = a*b
+	o.bb = b*b
+	for i=-1,width do
+		o[1][i] = Color:new()
+		o[2][i] = Color:new()
+		o[3][i] = Color:new()
+	end
+	function o:pset(x,p)
+		local ab = Color:new(p.r*self.ab, p.g*self.ab, p.b*self.ab)
+		local bb = Color:new(p.r*self.bb, p.g*self.bb, p.b*self.bb)
+		self[1][x]:add(ab)
+		self[2][x]:add(p,self.aa)
+		self[3][x]:add(ab)
+		x = x-1
+		self[1][x]:add(bb)
+		self[2][x]:add(ab)
+		self[3][x]:add(bb)
+		x = x+2
+		self[1][x]:add(bb)
+		self[2][x]:add(ab)
+		self[3][x]:add(bb)
+	end
+	function o:roll()
+	end
+	function o:err(ozer)
+		local err = 0
+		for x=0,width do
+			local p,q=self[1][x], ozer[1][x]
+			err = err + dist2(p,q)
+			p:clr()
+			q:clr()
+		end
+		self[1],self[2],self[3] = self[2],self[3],self[1]
+		ozer[1],ozer[2],ozer[3] = ozer[2],ozer[3],ozer[1]
+		return err
+	end
+	return o
+end
+
+local function dither_oric(callback, min_thr, aic)
+	err1:clear()
+	min_thr = min_thr or 1e300
+	local tot = 0
+	local res = {}
+	local buf = ''
+	local b1,b2 = blurryImg(),blurryImg()
+	for i=1,width*height do res[i]=0 end
+	for y=0,height-1 do
+		-- info(string.format("%2d%%", math.floor(100*y/height)))  
+		if callback then info(callback(y/height)) end
+		-- find best line
+		local line = optim(y,err1, aic)
+		local x0,x1,xs = 0,width-1,1
+		-- use serpentine
+		if y%2==1 then x0,x1,xs = x1,x0,-xs end
+		for x=x0,x1,xs do
+			local p = getLinearPixel(x,y)
+			local e = err1[x]:add(p):ordered_dither(x,y)
+			-- oric constaints
+			local cmd = line[math.floor(x/6)]
+			local c = cmd.bg
+			-- notice that at this point we can dither without decoding
+			-- cmd because bg/fg already contains the two available colors
+			-- for the current pixel.
+			local d1,d2 = dist2(e,pal[cmd.fg]),dist2(e,pal[cmd.bg])
+			if d1<=d2 then
+				c = cmd.fg
+				-- tot = tot + d1
+				if (cmd.cmd % 128)>=64 then
+					cmd.cmd = cmd.cmd + bitmask[x]
+				end
+			else
+				-- tot = tot + d2
+			end
+			if aic then
+				b1:pset(x,p:ordered_dither(x,y))
+				b2:pset(x,pal[c])
+			else
+				tot = tot + math.min(d1, d2)
+			end
+			-- tot = tot + p:ordered_dither(x,y):euclid2(pal[c])
+			-- if tot>min_thr then break end
+			-- store chosen color for later display on screen or
+			-- in BMP file
+			res[y*width + x + 1] = c
+			-- Ostromoukhov's diffusion
+			ostro:diffuse(p, e:sub(pal[c]), err1[x+xs], err2[x-xs], err2[x])
+		end
+		if aic then
+			tot = tot + b1:err(b2)
+			if tot>min_thr then break end
+		end
+		
+		-- prepare error for next line
+		err1,err2 = err2,err1
+		err2:clear()
+		if oric>0 then
+			-- add current line into buffer for tap file
+			local lbuf = {}
+			for i=0,w39 do lbuf[i+1] =line[i].cmd end
+			buf = buf .. string.char(unpack(lbuf))
+		end
+		if tot>min_thr or running==0 then break end
+	end
+	
+	return tot,res,buf
 end	
+
+local dither = oric>0 and dither_oric or dither_free
 
 -- convert full picture
 local start = os.clock()
@@ -1416,7 +1522,7 @@ if type(settings.aic)=="table" or settings.aic>0 then
 		end
 	end
 	local function lum(r,g,b) return 0.299*r + 0.587*g +0.114*b end
-	local intens = {lum(1,0,0),lum(0,1,0),lum(1,1,0),lum(0,0,1),lum(1,0,1),lum(0,1,1),lum(1,1,1)}
+	local intens = {}; for i=1,7 do intens[i]=pal[i]:lum() end
 	table.sort(couples, function(a,b) 
 		return intens[a[1]]+intens[a[2]]>intens[b[1]]+intens[b[2]] 
 	end)
@@ -1457,7 +1563,7 @@ if type(settings.aic)=="table" or settings.aic>0 then
 		-- t = err(r)
 		if t<tot then 
 			tot,res,buf = t,r,b 
-			extra = ' AIC=' .. pair[1] .. ',' .. pair[2]
+			extra = ' AIC=' .. pair[1] .. ',' .. pair[2] .. ' '..math.floor(.5 + tot^.5)
 			if tot==0 then running=0 end
 		end
 		if running==0 then break end

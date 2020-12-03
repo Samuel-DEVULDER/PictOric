@@ -23,7 +23,7 @@ Just copy [PictOric.lua](./PictOric.lua) wherever you want (possibly inside the 
 If you intend to use it in command-line, add the appropriate exes (`convert` and `luajit`) in your path or next to the lua script. 
 
 *Notice*: 
-* Windows exes are available in the tools/winb32 folder. Standalone `conver.exe`can also be found inside [that installer](https://imagemagick.org/download/binaries/ImageMagick-7.0.10-10-Q16-x64-static.exe).
+* Windows exes are available in the tools/winb32 folder. Standalone `convert.exe`can also be found inside [that installer](https://imagemagick.org/download/binaries/ImageMagick-7.0.10-10-Q16-x64-static.exe).
 * For other machine/platform, you'll have to manually compile the LuaJIT and ImageMagick projects sitting in the tools folder.
 
 ## Usage 
